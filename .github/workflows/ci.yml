@@ -1,0 +1,55 @@
+name: CI
+
+on: [ push, pull_request ]
+
+jobs:
+  tests-and-analysis:
+    name: "Tests and Analysis (JDK: ${{ matrix.jdk }})"
+    strategy:
+      matrix:
+        jdk: [ 8, 11, 17, 21 ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: ${{ matrix.jdk }}
+      - name: Set up cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.m2
+            !~/.m2/repository/de/learnlib/tooling
+          key: cache-tests-and-analysis-${{ matrix.jdk }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: cache-tests-and-analysis-${{ matrix.jdk }}-
+      - name: Run Maven
+        run: mvn -B install -Pcode-analysis,bundles
+  deploy:
+    name: "Deploy"
+    if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/develop' }}
+    needs: [ tests-and-analysis ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 8
+      - name: Set up cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.m2
+            !~/.m2/repository/de/learnlib/tooling
+          key: cache-deploy-${{ hashFiles('**/pom.xml') }}
+          restore-keys: cache-deploy-
+      - name: Run Maven
+        env: # make secrets available as environment variables
+          OSSRH_TOKEN_USERNAME: ${{ secrets.OSSRH_TOKEN_USERNAME }}
+          OSSRH_TOKEN_PASSWORD: ${{ secrets.OSSRH_TOKEN_PASSWORD }}
+        run: mvn -B -s $GITHUB_WORKSPACE/.github/settings.xml -DskipTests deploy
