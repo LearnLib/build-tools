@@ -24,9 +24,7 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.Function;
 
-import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
@@ -40,14 +38,12 @@ import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.WildcardType;
-import javax.tools.Diagnostic.Kind;
 
 import com.github.misberner.apcommons.util.ElementUtils;
 import com.github.misberner.apcommons.util.annotations.AnnotationUtils;
 import com.github.misberner.apcommons.util.methods.MethodUtils;
 import com.github.misberner.apcommons.util.methods.ParameterInfo;
 import com.github.misberner.apcommons.util.types.TypeUtils;
-import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -58,19 +54,14 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 import com.squareup.javapoet.WildcardTypeName;
-import de.learnlib.tooling.annotation.Generated;
 import de.learnlib.tooling.annotation.refinement.GenerateRefinement;
 import de.learnlib.tooling.annotation.refinement.GenerateRefinements;
 import de.learnlib.tooling.annotation.refinement.Generic;
 import de.learnlib.tooling.annotation.refinement.Interface;
 import de.learnlib.tooling.annotation.refinement.Map;
+import de.learnlib.tooling.processor.AbstractLearnLibProcessor;
 
-public class RefinementProcessor extends AbstractProcessor {
-
-    @Override
-    public SourceVersion getSupportedSourceVersion() {
-        return SourceVersion.latestSupported();
-    }
+public class RefinementProcessor extends AbstractLearnLibProcessor {
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
@@ -115,7 +106,7 @@ public class RefinementProcessor extends AbstractProcessor {
                             .build()
                             .writeTo(super.processingEnv.getFiler());
                 } catch (IOException e) {
-                    error("Could not writer source: " + e.getMessage());
+                    super.error("Could not writer source: " + e.getMessage());
                 }
 
                 idx++;
@@ -126,7 +117,7 @@ public class RefinementProcessor extends AbstractProcessor {
 
     private void validateAnnotation(Element element) {
         if (element.getKind() != ElementKind.CLASS) {
-            error("Annotation " + GenerateRefinement.class + " is only supported on class level");
+            super.error("Annotation " + GenerateRefinement.class + " is only supported on class level");
             throw new IllegalArgumentException();
         }
     }
@@ -136,14 +127,7 @@ public class RefinementProcessor extends AbstractProcessor {
                        .addModifiers(Modifier.PUBLIC)
                        .addJavadoc("This is an auto-generated refinement. See the {@link $T original class}.\n",
                                    super.processingEnv.getTypeUtils().erasure(annotatedClass.asType()))
-                       .addAnnotation(createAnnotation(annotatedClass));
-    }
-
-    private AnnotationSpec createAnnotation(TypeElement annotatedClass) {
-        return AnnotationSpec.builder(Generated.class)
-                             .addMember("generator", "$S", RefinementProcessor.class.getCanonicalName())
-                             .addMember("source", "$S", annotatedClass.toString())
-                             .build();
+                       .addAnnotation(super.createAnnotation(annotatedClass));
     }
 
     private void addGenerics(TypeSpec.Builder builder, GenerateRefinement annotation) {
@@ -402,10 +386,6 @@ public class RefinementProcessor extends AbstractProcessor {
                 throw mte;
             }
         }
-    }
-
-    private void error(String msg) {
-        super.processingEnv.getMessager().printMessage(Kind.ERROR, msg);
     }
 
     @SuppressWarnings("unchecked")
