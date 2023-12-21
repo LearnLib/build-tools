@@ -99,6 +99,7 @@ limitations under the License.
 
         <!-- dependency versions -->
         <ap-commons.version>0.0.2</ap-commons.version>
+        <brics.version>1.12-4</brics.version>
         <checkstyle.version>9.3</checkstyle.version>
         <compile-testing.version>0.21.0</compile-testing.version>
         <extra-enforcer-rules.version>1.7.0</extra-enforcer-rules.version>
@@ -117,6 +118,12 @@ limitations under the License.
             <groupId>com.squareup</groupId>
             <artifactId>javapoet</artifactId>
             <version>${javapoet.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>dk.brics</groupId>
+            <artifactId>automaton</artifactId>
+            <version>${brics.version}</version>
         </dependency>
 
         <dependency>
