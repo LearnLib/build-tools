@@ -104,6 +104,7 @@ limitations under the License.
         <compile-testing.version>0.21.0</compile-testing.version>
         <extra-enforcer-rules.version>1.7.0</extra-enforcer-rules.version>
         <javapoet.version>1.13.0</javapoet.version>
+        <metainf-services.version>1.8</metainf-services.version>
         <testng.version>7.5.1</testng.version>
     </properties>
 
@@ -124,6 +125,13 @@ limitations under the License.
             <groupId>dk.brics</groupId>
             <artifactId>automaton</artifactId>
             <version>${brics.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.kohsuke.metainf-services</groupId>
+            <artifactId>metainf-services</artifactId>
+            <version>${metainf-services.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -166,6 +174,14 @@ limitations under the License.
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${compiler-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>default-testCompile</id>
+                            <configuration>
+                                <proc>none</proc>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

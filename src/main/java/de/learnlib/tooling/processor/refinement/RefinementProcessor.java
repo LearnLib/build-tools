@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.Function;
 
+import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
@@ -60,7 +61,9 @@ import de.learnlib.tooling.annotation.refinement.Generic;
 import de.learnlib.tooling.annotation.refinement.Interface;
 import de.learnlib.tooling.annotation.refinement.Map;
 import de.learnlib.tooling.processor.AbstractLearnLibProcessor;
+import org.kohsuke.MetaInfServices;
 
+@MetaInfServices(Processor.class)
 public class RefinementProcessor extends AbstractLearnLibProcessor {
 
     @Override

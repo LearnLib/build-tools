@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
+import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -49,7 +50,9 @@ import com.squareup.javapoet.TypeVariableName;
 import de.learnlib.tooling.annotation.builder.GenerateBuilder;
 import de.learnlib.tooling.annotation.builder.Option;
 import de.learnlib.tooling.processor.AbstractLearnLibProcessor;
+import org.kohsuke.MetaInfServices;
 
+@MetaInfServices(Processor.class)
 public class BuilderProcessor extends AbstractLearnLibProcessor {
 
     @Override
