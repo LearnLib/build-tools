@@ -1,4 +1,3 @@
-
 package de.learnlib.tooling.it.edsl;
 
 import de.learnlib.tooling.annotation.Generated;

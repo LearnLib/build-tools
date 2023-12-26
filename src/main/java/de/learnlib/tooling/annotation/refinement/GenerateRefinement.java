@@ -55,7 +55,7 @@ public @interface GenerateRefinement {
      *
      * @return a mapping of specializations of parameter types for the refinement's constructor parameters
      */
-    Map[] parameterMapping() default {};
+    Mapping[] typeMapping() default {};
 
     /**
      * An array of additional interfaces the refinement should implement.

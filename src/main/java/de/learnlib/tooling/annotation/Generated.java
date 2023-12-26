@@ -29,18 +29,16 @@ import java.lang.annotation.Target;
 public @interface Generated {
 
     /**
-     * The generator element MUST have the name of the code generator. The name is the fully qualified name of the code
-     * generator.
+     * The the fully qualified name of the code generator.
      *
-     * @return The name of the code generator
+     * @return The the fully qualified name of the code generator
      */
     String[] generator();
 
     /**
-     * The source element MUST have the name of the source. The name is the fully qualified name of the annotated
-     * class.
+     * The fully qualified name of the annotated class.
      *
-     * @return The name of the annotated class
+     * @return The fully qualified name of the annotated class
      */
     String source();
 }

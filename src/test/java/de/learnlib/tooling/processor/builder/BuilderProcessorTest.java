@@ -14,6 +14,8 @@
  */
 package de.learnlib.tooling.processor.builder;
 
+import java.io.IOException;
+
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.CompilationSubject;
 import com.google.testing.compile.Compiler;
@@ -30,46 +32,50 @@ import org.testng.annotations.Test;
 public class BuilderProcessorTest {
 
     @Test
-    public void testSimpleBuilder() {
+    public void testSimpleBuilder() throws IOException {
         final Compilation compilation =
                 Compiler.javac().withProcessors(new BuilderProcessor()).compile(Util.toJFO(SimpleBuilderIT.class));
 
         final CompilationSubject subject = CompilationSubject.assertThat(compilation);
         subject.succeededWithoutWarnings();
         subject.generatedSourceFile(Util.toFQN(SimpleBuilderITBuilder.class))
-               .hasSourceEquivalentTo(Util.toJFO(SimpleBuilderITBuilder.class));
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(SimpleBuilderITBuilder.class).getCharContent(false));
     }
 
     @Test
-    public void testRenamingBuilder() {
+    public void testRenamingBuilder() throws IOException {
         final Compilation compilation =
                 Compiler.javac().withProcessors(new BuilderProcessor()).compile(Util.toJFO(RenamingBuilderIT.class));
 
         final CompilationSubject subject = CompilationSubject.assertThat(compilation);
         subject.succeededWithoutWarnings();
         subject.generatedSourceFile(Util.toFQN(RenamedBuilderITResult.class))
-               .hasSourceEquivalentTo(Util.toJFO(RenamedBuilderITResult.class));
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(RenamedBuilderITResult.class).getCharContent(false));
     }
 
     @Test
-    public void testDisablingBuilder() {
+    public void testDisablingBuilder() throws IOException {
         final Compilation compilation =
                 Compiler.javac().withProcessors(new BuilderProcessor()).compile(Util.toJFO(DisablingBuilderIT.class));
 
         final CompilationSubject subject = CompilationSubject.assertThat(compilation);
         subject.succeededWithoutWarnings();
         subject.generatedSourceFile(Util.toFQN(DisablingBuilderITBuilder.class))
-               .hasSourceEquivalentTo(Util.toJFO(DisablingBuilderITBuilder.class));
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(DisablingBuilderITBuilder.class).getCharContent(false));
     }
 
     @Test
-    public void testGenericBuilder() {
+    public void testGenericBuilder() throws IOException {
         final Compilation compilation =
                 Compiler.javac().withProcessors(new BuilderProcessor()).compile(Util.toJFO(GenericBuilderIT.class));
 
         final CompilationSubject subject = CompilationSubject.assertThat(compilation);
         subject.succeededWithoutWarnings();
         subject.generatedSourceFile(Util.toFQN(GenericBuilderITResult.class))
-               .hasSourceEquivalentTo(Util.toJFO(GenericBuilderITResult.class));
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(GenericBuilderITResult.class).getCharContent(false));
     }
 }

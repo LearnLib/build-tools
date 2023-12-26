@@ -5,7 +5,7 @@ import java.lang.Boolean;
 import java.lang.String;
 
 /**
- * This is an auto-generated refinement. See the {@link SingleRefinementIT original class}.
+ * This is an auto-generated refinement of {@link SingleRefinementIT}.
  */
 @Generated(
         generator = "de.learnlib.tooling.processor.refinement.RefinementProcessor",
@@ -13,7 +13,7 @@ import java.lang.String;
 )
 public class SingleRefinementITResult<M> extends SingleRefinementIT<M, Boolean> implements SubInterface<Boolean> {
     /**
-     * This is an auto-generated constructor. See the {@link SingleRefinementIT#SingleRefinementIT(int, SuperInterface, String, SuperInterface2) original constructor}.
+     * This is an auto-generated constructor calling {@link SingleRefinementIT#SingleRefinementIT(int, SuperInterface, String, SuperInterface2)}.
      */
     public SingleRefinementITResult(int param1, SubInterface<M> param2, String param3,
             SubInterface2<Boolean> param4) {

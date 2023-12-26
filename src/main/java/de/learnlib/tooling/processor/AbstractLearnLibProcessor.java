@@ -14,12 +14,22 @@
  */
 package de.learnlib.tooling.processor;
 
+import java.lang.annotation.Annotation;
+import java.util.List;
+
 import javax.annotation.processing.AbstractProcessor;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
-import javax.tools.Diagnostic.Kind;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.TypeElement;
 
 import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.ArrayTypeName;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeVariableName;
 import de.learnlib.tooling.annotation.Generated;
 
 public abstract class AbstractLearnLibProcessor extends AbstractProcessor {
@@ -29,15 +39,51 @@ public abstract class AbstractLearnLibProcessor extends AbstractProcessor {
         return SourceVersion.latestSupported();
     }
 
-    public AnnotationSpec createAnnotation(Element annotatedClass) {
+    protected AnnotationSpec createAnnotation(Element annotatedClass) {
         return AnnotationSpec.builder(Generated.class)
                              .addMember("generator", "$S", getClass().getCanonicalName())
                              .addMember("source", "$S", annotatedClass.toString())
                              .build();
     }
 
-    public void error(String msg) {
-        super.processingEnv.getMessager().printMessage(Kind.ERROR, msg);
+    protected TypeElement validateClassKind(Element element, Class<? extends Annotation> annotation) {
+        if (element.getKind() != ElementKind.CLASS) {
+            throw new IllegalArgumentException("Annotation " + annotation + " is only supported on classes");
+        }
+
+        return (TypeElement) element;
     }
 
+    protected String getPackageName(Element element, String defaultValue) {
+        if (defaultValue != null && !defaultValue.isEmpty()) {
+            return defaultValue;
+        } else {
+            return super.processingEnv.getElementUtils().getPackageOf(element).getQualifiedName().toString();
+        }
+    }
+
+    protected boolean requiresSafeVarargs(MethodSpec.Builder mBuilder) {
+        final List<ParameterSpec> parameters = mBuilder.parameters;
+
+        if (parameters.isEmpty()) {
+            return false;
+        } else {
+            final ParameterSpec last = parameters.get(parameters.size() - 1);
+            final TypeName type = last.type;
+
+            return requiresSafeVarargs(type);
+        }
+    }
+
+    private boolean requiresSafeVarargs(TypeName type) {
+        if (type instanceof ParameterizedTypeName) {
+            return true;
+        } else if (type instanceof TypeVariableName) {
+            return true;
+        } else if (type instanceof ArrayTypeName) {
+            return requiresSafeVarargs(((ArrayTypeName) type).componentType);
+        } else {
+            return false;
+        }
+    }
 }

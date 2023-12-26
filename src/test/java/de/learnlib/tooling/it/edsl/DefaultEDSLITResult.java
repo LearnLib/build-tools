@@ -1,4 +1,3 @@
-
 package de.learnlib.tooling.it.edsl;
 
 import de.learnlib.tooling.annotation.Generated;
@@ -96,7 +95,7 @@ public class DefaultEDSLITResult<I, SP, TP, A> {
         }
 
         public DefaultEDSLITResult<I, SP, TP, A> withStateProperty(SP stateProperty,
-                                                                   Object stateId) {
+                Object stateId) {
             delegate.withStateProperty(stateProperty, stateId);
             return getDefaultEDSLITResult();
         }

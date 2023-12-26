@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target({})
-public @interface Map {
+public @interface Mapping {
 
     /**
      * The type of input parameter that if matched (equality) should be replaced.
@@ -40,19 +40,10 @@ public @interface Map {
     Class<?> to();
 
     /**
-     * Potential nested type parameters of the replacement (cf. {@link #to()}) type. If the replacement type has inner
-     * type variables use {@link #withComplexGenerics()}.
+     * Potential nested type parameters of the {@link #to() replacement} type.
      *
      * @return potential nested type parameters of the replacement type
      */
-    String[] withGenerics() default {};
-
-    /**
-     * Potential nested type parameters of the replacement (cf. {@link #to()}) type that may contain inner type
-     * variables themselves.
-     *
-     * @return potential nested type parameters of the replacement type
-     */
-    Generic[] withComplexGenerics() default {};
+    Generic[] generics() default {};
 
 }

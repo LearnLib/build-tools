@@ -37,6 +37,6 @@ public @interface Interface {
      *
      * @return potential nested type parameters of the referenced interface
      */
-    String[] generics() default {};
+    Generic[] generics() default {};
 
 }

@@ -14,6 +14,7 @@
  */
 package de.learnlib.tooling.processor.edsl;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import com.google.testing.compile.Compilation;
@@ -40,7 +41,8 @@ public class EDSLProcessorTest {
         final CompilationSubject subject = CompilationSubject.assertThat(compilation);
         subject.succeededWithoutWarnings();
         subject.generatedSourceFile(Util.toFQN(DefaultEDSLITResult.class))
-               .hasSourceEquivalentTo(Util.toJFO(DefaultEDSLITResult.class));
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(DefaultEDSLITResult.class).getCharContent(false));
 
         // check that we can use the result as intended
         final String arg = "string";
@@ -59,7 +61,8 @@ public class EDSLProcessorTest {
         final CompilationSubject subject = CompilationSubject.assertThat(compilation);
         subject.succeededWithoutWarnings();
         subject.generatedSourceFile(Util.toFQN(ExtendingEDSLITResult.class))
-               .hasSourceEquivalentTo(Util.toJFO(ExtendingEDSLITResult.class));
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(ExtendingEDSLITResult.class).getCharContent(false));
 
         // check that we can use the result as intended
         ExtendingEDSLITResult<Integer, ?> fluent = new ExtendingEDSLITResult<>(null);
@@ -77,7 +80,7 @@ public class EDSLProcessorTest {
     }
 
     @Test
-    public void testEmptyEDSL() {
+    public void testEmptyEDSL() throws IOException {
         // we need to compile both files, otherwise the annotations are missing on the super classes
         final Compilation compilation =
                 Compiler.javac().withProcessors(new EDSLProcessor()).compile(Util.toJFO(EmptyEDSLIT.class));
@@ -85,7 +88,8 @@ public class EDSLProcessorTest {
         final CompilationSubject subject = CompilationSubject.assertThat(compilation);
         subject.succeededWithoutWarnings();
         subject.generatedSourceFile(Util.toFQN(EmptyEDSLITResult.class))
-               .hasSourceEquivalentTo(Util.toJFO(EmptyEDSLITResult.class));
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(EmptyEDSLITResult.class).getCharContent(false));
 
         // check that we can use the result as intended
         EmptyEDSLITResult fluent = new EmptyEDSLITResult();
@@ -93,7 +97,7 @@ public class EDSLProcessorTest {
     }
 
     @Test
-    public void testOverlappingEDSL() {
+    public void testOverlappingEDSL() throws IOException {
         // we need to compile both files, otherwise the annotations are missing on the super classes
         final Compilation compilation =
                 Compiler.javac().withProcessors(new EDSLProcessor()).compile(Util.toJFO(OverlappingEDSLIT.class));
@@ -101,7 +105,8 @@ public class EDSLProcessorTest {
         final CompilationSubject subject = CompilationSubject.assertThat(compilation);
         subject.succeededWithoutWarnings();
         subject.generatedSourceFile(Util.toFQN(OverlappingEDSLITResult.class))
-               .hasSourceEquivalentTo(Util.toJFO(OverlappingEDSLITResult.class));
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(OverlappingEDSLITResult.class).getCharContent(false));
 
         // check that we can use the result as intended
         OverlappingEDSLITResult fluent = new OverlappingEDSLITResult();

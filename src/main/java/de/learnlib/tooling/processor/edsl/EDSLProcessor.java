@@ -31,20 +31,16 @@ import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 
-import com.github.misberner.apcommons.util.ElementUtils;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
@@ -56,6 +52,7 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeSpec.Builder;
 import com.squareup.javapoet.TypeVariableName;
+import de.learnlib.tooling.annotation.builder.GenerateBuilder;
 import de.learnlib.tooling.annotation.edsl.Action;
 import de.learnlib.tooling.annotation.edsl.Expr;
 import de.learnlib.tooling.annotation.edsl.GenerateEDSL;
@@ -63,9 +60,7 @@ import de.learnlib.tooling.processor.AbstractLearnLibProcessor;
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.RegExp;
 import dk.brics.automaton.State;
-import org.kohsuke.MetaInfServices;
 
-@MetaInfServices(Processor.class)
 public class EDSLProcessor extends AbstractLearnLibProcessor {
 
     @Override
@@ -85,13 +80,13 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
 
         for (Element e : roundEnv.getElementsAnnotatedWith(GenerateEDSL.class)) {
 
-            final TypeElement elem = (TypeElement) e;
+            final TypeElement elem = super.validateClassKind(e, GenerateBuilder.class);
             final GenerateEDSL annotation = elem.getAnnotation(GenerateEDSL.class);
 
             final String name = annotation.name();
-            final String pkg = getPackageName(elem, annotation);
+            final String pkg = super.getPackageName(elem, annotation.packageName());
             final Modifier[] modifiers = annotation.isPublic() ? new Modifier[] {Modifier.PUBLIC} : new Modifier[0];
-            final String syntax = getExpandedSyntax(annotation);
+            final String syntax = getExpandedSyntax(elem, annotation);
             final List<String> tokens = getTokens(syntax);
 
             final Map<String, Character> token2Label = new HashMap<>();
@@ -190,20 +185,14 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
                                                                                                .collect(Collectors.toList()));
 
                             final StringJoiner sj = new StringJoiner(", ", "$N.$N(", ")");
-                            VariableElement lastParameter = null;
                             for (VariableElement p : m.getParameters()) {
                                 String pName = p.getSimpleName().toString();
                                 methodBuilder.addParameter(ParameterSpec.builder(ParameterizedTypeName.get(p.asType()),
                                                                                  pName).build());
                                 sj.add(pName);
-                                lastParameter = p;
                             }
 
-                            final boolean isSafeVarargs = lastParameter != null && m.isVarArgs() &&
-                                                          ((ArrayType) lastParameter.asType()).getComponentType()
-                                                                                              .getKind() ==
-                                                          TypeKind.TYPEVAR;
-                            if (isSafeVarargs) {
+                            if (m.isVarArgs() && super.requiresSafeVarargs(methodBuilder)) {
                                 methodBuilder.addModifiers(Modifier.FINAL).addAnnotation(SafeVarargs.class);
                             }
 
@@ -241,13 +230,13 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
                         .build()
                         .writeTo(super.processingEnv.getFiler());
             } catch (IOException ioe) {
-                super.error("Could not writer source: " + ioe.getMessage());
+                throw new IllegalStateException(ioe);
             }
         }
         return true;
     }
 
-    private String getExpandedSyntax(GenerateEDSL annotation) {
+    private String getExpandedSyntax(TypeElement clazz, GenerateEDSL annotation) {
 
         String result = annotation.syntax();
 
@@ -259,8 +248,8 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
         }
 
         if (result.contains("<") || result.contains(">")) {
-            throw new IllegalArgumentException(
-                    '\'' + annotation.syntax() + "' contains expressions that could not be substituted");
+            throw new IllegalArgumentException("Syntax '" + annotation.syntax() + "' in " + clazz +
+                                               " contains expressions that could not be substituted");
         }
 
         return result;
@@ -305,7 +294,7 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
 
         if (!result.keySet().containsAll(tokensAsSet)) {
             tokensAsSet.removeAll(result.keySet());
-            throw new IllegalArgumentException("Could not find action for tokens: " + tokensAsSet);
+            throw new IllegalArgumentException("Could not find action for tokens: " + tokensAsSet + " in " + clazz);
         }
 
         return result;
@@ -323,7 +312,7 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
         final List<ExecutableElement> constructors = ElementFilter.constructorsIn(getAnnotatedElements(clazz));
 
         if (constructors.isEmpty()) {
-            throw new IllegalArgumentException("Could not find annotated constructor");
+            throw new IllegalArgumentException("Could not find annotated constructor while processing " + clazz);
         }
 
         return constructors;
@@ -348,15 +337,5 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
         }
 
         return builder;
-    }
-
-    private String getPackageName(Element element, GenerateEDSL annotation) {
-        final String pkg = annotation.packageName();
-
-        if (pkg == null || pkg.isEmpty()) {
-            return ElementUtils.getPackageName(element);
-        } else {
-            return pkg;
-        }
     }
 }

@@ -17,16 +17,16 @@ package de.learnlib.tooling.it.refinement;
 import de.learnlib.tooling.annotation.refinement.GenerateRefinement;
 import de.learnlib.tooling.annotation.refinement.Generic;
 import de.learnlib.tooling.annotation.refinement.Interface;
-import de.learnlib.tooling.annotation.refinement.Map;
+import de.learnlib.tooling.annotation.refinement.Mapping;
 
 @GenerateRefinement(name = "SingleRefinementITResult",
                     generics = "M",
                     parentGenerics = {@Generic("M"), @Generic(clazz = Boolean.class)},
-                    parameterMapping = {@Map(from = SuperInterface.class, to = SubInterface.class, withGenerics = "M"),
-                                        @Map(from = SuperInterface2.class,
-                                             to = SubInterface2.class,
-                                             withComplexGenerics = @Generic(clazz = Boolean.class))},
-                    interfaces = @Interface(clazz = SubInterface.class, generics = "Boolean"))
+                    typeMapping = {@Mapping(from = SuperInterface.class, to = SubInterface.class, generics = @Generic("M")),
+                                   @Mapping(from = SuperInterface2.class,
+                                            to = SubInterface2.class,
+                                            generics = @Generic(clazz = Boolean.class))},
+                    interfaces = @Interface(clazz = SubInterface.class, generics = @Generic(clazz = Boolean.class)))
 public class SingleRefinementIT<I, O> implements SuperInterface<O> {
 
     public SingleRefinementIT(int param1,

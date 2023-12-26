@@ -26,7 +26,8 @@ import java.lang.annotation.Target;
 public @interface Generic {
 
     /**
-     * A literal representation of a type parameter (e.g. defined in {@link GenerateRefinement#generics()}).
+     * A literal representation of a type parameter (e.g. defined in {@link GenerateRefinement#generics()}). A non-empty
+     * value has a higher precedence over any {@link #clazz()} parameter.
      *
      * @return a literal representation of a type parameter
      */
@@ -40,7 +41,7 @@ public @interface Generic {
     Class<?> clazz() default Void.class;
 
     /**
-     * Potential nested type parameters of the referenced (cf. {@link #clazz()}) referential type parameter.
+     * Potential nested type parameters of the referenced {@link #clazz() referential} type parameter.
      *
      * @return potential nested type parameters of the referenced referential type parameter
      */

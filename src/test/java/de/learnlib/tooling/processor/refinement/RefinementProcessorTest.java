@@ -14,10 +14,14 @@
  */
 package de.learnlib.tooling.processor.refinement;
 
+import java.io.IOException;
+
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.CompilationSubject;
 import com.google.testing.compile.Compiler;
 import de.learnlib.tooling.Util;
+import de.learnlib.tooling.it.refinement.GenericRefinementIT;
+import de.learnlib.tooling.it.refinement.GenericRefinementITResult;
 import de.learnlib.tooling.it.refinement.MultiRefinementIT;
 import de.learnlib.tooling.it.refinement.MultiRefinementITResult1;
 import de.learnlib.tooling.it.refinement.MultiRefinementITResult2;
@@ -30,7 +34,7 @@ import org.testng.annotations.Test;
 public class RefinementProcessorTest {
 
     @Test
-    public void testSimpleRefinement() {
+    public void testSimpleRefinement() throws IOException {
         final Compilation compilation = Compiler.javac()
                                                 .withProcessors(new RefinementProcessor())
                                                 .compile(Util.toJFO(SimpleRefinementIT.class));
@@ -38,11 +42,12 @@ public class RefinementProcessorTest {
         final CompilationSubject subject = CompilationSubject.assertThat(compilation);
         subject.succeededWithoutWarnings();
         subject.generatedSourceFile(Util.toFQN(SimpleRefinementITResult.class))
-               .hasSourceEquivalentTo(Util.toJFO(SimpleRefinementITResult.class));
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(SimpleRefinementITResult.class).getCharContent(false));
     }
 
     @Test
-    public void testSingleRefinement() {
+    public void testSingleRefinement() throws IOException {
         final Compilation compilation = Compiler.javac()
                                                 .withProcessors(new RefinementProcessor())
                                                 .compile(Util.toJFO(SingleRefinementIT.class));
@@ -50,20 +55,34 @@ public class RefinementProcessorTest {
         final CompilationSubject subject = CompilationSubject.assertThat(compilation);
         subject.succeededWithoutWarnings();
         subject.generatedSourceFile(Util.toFQN(SingleRefinementITResult.class))
-               .hasSourceEquivalentTo(Util.toJFO(SingleRefinementITResult.class));
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(SingleRefinementITResult.class).getCharContent(false));
     }
 
     @Test
-    public void testMultiRefinement() {
-        final Compilation compilation = Compiler.javac()
-                                                .withProcessors(new RefinementProcessor())
-                                                .compile(Util.toJFO(MultiRefinementIT.class));
+    public void testMultiRefinement() throws IOException {
+        final Compilation compilation =
+                Compiler.javac().withProcessors(new RefinementProcessor()).compile(Util.toJFO(MultiRefinementIT.class));
 
         final CompilationSubject subject = CompilationSubject.assertThat(compilation);
         subject.succeededWithoutWarnings();
         subject.generatedSourceFile(Util.toFQN(MultiRefinementITResult1.class))
-               .hasSourceEquivalentTo(Util.toJFO(MultiRefinementITResult1.class));
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(MultiRefinementITResult1.class).getCharContent(false));
         subject.generatedSourceFile(Util.toFQN(MultiRefinementITResult2.class))
-               .hasSourceEquivalentTo(Util.toJFO(MultiRefinementITResult2.class));
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(MultiRefinementITResult2.class).getCharContent(false));
+    }
+
+    @Test
+    public void testGenericRefinement() throws IOException {
+        final Compilation compilation =
+                Compiler.javac().withProcessors(new RefinementProcessor()).compile(Util.toJFO(GenericRefinementIT.class));
+
+        final CompilationSubject subject = CompilationSubject.assertThat(compilation);
+        subject.succeededWithoutWarnings();
+        subject.generatedSourceFile(Util.toFQN(GenericRefinementITResult.class))
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(GenericRefinementITResult.class).getCharContent(false));
     }
 }

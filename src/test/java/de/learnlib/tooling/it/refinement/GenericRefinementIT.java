@@ -14,23 +14,22 @@
  */
 package de.learnlib.tooling.it.refinement;
 
+import java.util.Collection;
+
 import de.learnlib.tooling.annotation.refinement.GenerateRefinement;
 import de.learnlib.tooling.annotation.refinement.Generic;
 import de.learnlib.tooling.annotation.refinement.Mapping;
 
-@GenerateRefinement(name = "MultiRefinementITResult1",
-                    generics = "M",
-                    parentGenerics = @Generic("M"),
-                    typeMapping = {@Mapping(from = Object.class, to = String.class),
-                                   @Mapping(from = SuperInterface.class,
-                                            to = SubInterface.class,
-                                            generics = @Generic(clazz = SuperInterface2.class, generics = "M"))})
-@GenerateRefinement(name = "MultiRefinementITResult2", parentGenerics = @Generic(clazz = String[].class))
-public class MultiRefinementIT<I> implements SuperInterface<I> {
+@GenerateRefinement(name = "GenericRefinementITResult",
+                    parentGenerics = {@Generic(clazz = String.class), @Generic(clazz = Boolean.class)},
+                    typeMapping = @Mapping(from = SuperInterface.class,
+                                           to = SubInterface.class,
+                                           generics = @Generic(clazz = String.class)))
+public class GenericRefinementIT<I, O> {
 
-    public MultiRefinementIT(int[] param1, Object[] param2) {}
+    public GenericRefinementIT(O a, SuperInterface<?>... b) {}
 
     @SafeVarargs
-    public MultiRefinementIT(int[] param1, Object[] param2, SuperInterface<? extends SuperInterface2<?>>... param3) {}
+    public GenericRefinementIT(Collection<? extends SuperInterface<I>> a, I... b) {}
 
 }

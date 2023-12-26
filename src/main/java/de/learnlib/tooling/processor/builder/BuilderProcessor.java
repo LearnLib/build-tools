@@ -15,14 +15,12 @@
 package de.learnlib.tooling.processor.builder;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
-import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -30,14 +28,11 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.MirroredTypeException;
-import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 
-import com.github.misberner.apcommons.util.ElementUtils;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
@@ -50,9 +45,7 @@ import com.squareup.javapoet.TypeVariableName;
 import de.learnlib.tooling.annotation.builder.GenerateBuilder;
 import de.learnlib.tooling.annotation.builder.Option;
 import de.learnlib.tooling.processor.AbstractLearnLibProcessor;
-import org.kohsuke.MetaInfServices;
 
-@MetaInfServices(Processor.class)
 public class BuilderProcessor extends AbstractLearnLibProcessor {
 
     @Override
@@ -69,7 +62,7 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
             final GenerateBuilder annotation = elem.getAnnotation(GenerateBuilder.class);
 
             final String name = getBuilderName(elem, annotation);
-            final String pkg = getPackageName(elem, annotation);
+            final String pkg = super.getPackageName(elem, annotation.packageName());
             final String create = annotation.createName();
             final Iterable<Modifier> modifiers =
                     annotation.builderPublic() ? Collections.singleton(Modifier.PUBLIC) : Collections.emptyList();
@@ -101,13 +94,11 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
                                                                                   .collect(Collectors.toList()));
 
             final List<? extends VariableElement> params = elem.getParameters();
-            final List<String> fieldNames = new ArrayList<>(params.size());
+            final StringJoiner returnJoiner = new StringJoiner(", ", "return new $T(", ")");
 
             for (int i = 0; i < params.size(); i++) {
                 final VariableElement ve = params.get(i);
                 final boolean isVarArgs = elem.isVarArgs() && i == params.size() - 1;
-                final boolean isSafeVarargs =
-                        isVarArgs && ((ArrayType) ve.asType()).getComponentType().getKind() == TypeKind.TYPEVAR;
                 final Option paramAnnotation = ve.getAnnotation(Option.class);
                 final boolean isFieldSuppressed;
                 final String fieldName;
@@ -129,8 +120,8 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
                     fieldName = ve.getSimpleName().toString();
                 }
 
+                returnJoiner.add(fieldName);
                 final TypeName fieldTypeName = ClassName.get(ve.asType());
-                fieldNames.add(fieldName);
 
                 // attribute
                 classBuilder.addField(FieldSpec.builder(fieldTypeName, fieldName, Modifier.PRIVATE).build());
@@ -171,7 +162,7 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
                                           .varargs(isVarArgs)
                                           .addParameter(fieldTypeName, fieldName)
                                           .addStatement("this.$N = $N", fieldName, fieldName);
-                        if (isSafeVarargs) {
+                        if (isVarArgs && super.requiresSafeVarargs(setterBuilder)) {
                             setterBuilder.addModifiers(Modifier.FINAL).addAnnotation(SafeVarargs.class);
                         }
                         classBuilder.addMethod(setterBuilder.build());
@@ -191,7 +182,7 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
                                           .addParameter(fieldTypeName, fieldName)
                                           .addStatement("this.$N = $N", fieldName, fieldName)
                                           .addStatement("return this");
-                        if (isSafeVarargs) {
+                        if (isVarArgs && super.requiresSafeVarargs(withBuilder)) {
                             withBuilder.addModifiers(Modifier.FINAL).addAnnotation(SafeVarargs.class);
                         }
                         classBuilder.addMethod(withBuilder.build());
@@ -201,15 +192,13 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
                 // create
                 if (paramAnnotation != null && paramAnnotation.requiredOnCreation()) {
                     createBuilder.varargs(isVarArgs).addParameter(fieldTypeName, fieldName);
-                    if (isSafeVarargs) {
+                    if (isVarArgs && super.requiresSafeVarargs(createBuilder)) {
                         createBuilder.addModifiers(Modifier.FINAL).addAnnotation(SafeVarargs.class);
                     }
                 }
             }
 
-            final StringJoiner sj = new StringJoiner(", ", "return new $T(", ")");
-            fieldNames.forEach(sj::add);
-            createBuilder.addStatement(CodeBlock.of(sj.toString(), ClassName.get(clazz.asType())));
+            createBuilder.addStatement(returnJoiner.toString(), ClassName.get(clazz.asType()));
 
             classBuilder.addMethod(constructorBuilder.build());
             classBuilder.addMethod(createBuilder.build());
@@ -220,7 +209,7 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
                         .build()
                         .writeTo(super.processingEnv.getFiler());
             } catch (IOException ioe) {
-                super.error("Could not writer source: " + ioe.getMessage());
+                throw new IllegalStateException(ioe);
             }
         }
         return true;
@@ -250,16 +239,6 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
             return element.getEnclosingElement().getSimpleName().toString() + "Builder";
         } else {
             return name;
-        }
-    }
-
-    private String getPackageName(Element element, GenerateBuilder annotation) {
-        final String pkg = annotation.packageName();
-
-        if (pkg == null || pkg.isEmpty()) {
-            return ElementUtils.getPackageName(element);
-        } else {
-            return pkg;
         }
     }
 
