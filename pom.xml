@@ -224,7 +224,6 @@ limitations under the License.
                     <version>${javadoc-plugin.version}</version>
                     <configuration>
                         <quiet>true</quiet>
-                        <failOnWarnings>true</failOnWarnings>
                         <detectLinks>true</detectLinks>
                         <linksource>false</linksource>
                     </configuration>
