@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
-import java.util.function.Function;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -36,7 +36,6 @@ import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.WildcardType;
 import javax.lang.model.util.ElementFilter;
@@ -82,25 +81,34 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
 
         for (Element elem : elements) {
 
-            super.validateClassKind(elem, GenerateRefinement.class);
+            if (elem.getKind() != ElementKind.CLASS) {
+                super.printWarning("Generating refinements is only supported for classes. Skipping...", elem);
+                continue;
+            }
+
+            // cast is fine because annotation is only allowed on ElementType.TYPE
+            final TypeElement annotatedClass = (TypeElement) elem;
 
             for (GenerateRefinement annotation : elem.getAnnotationsByType(GenerateRefinement.class)) {
-
-                final TypeElement annotatedClass = (TypeElement) elem;
 
                 final TypeSpec.Builder builder = createClass(annotatedClass, annotation);
                 final Map<String, Generic> typeVarMap = addSuperClass(builder, annotatedClass, annotation);
 
+                if (typeVarMap == null) {
+                    continue;
+                }
+
                 addInterfaces(builder, annotation);
                 addConstructors(builder, annotatedClass, annotation, typeVarMap);
 
-                try {
-                    JavaFile.builder(super.getPackageName(elem, ""), builder.build())
-                            .indent("    ")
-                            .build()
-                            .writeTo(super.processingEnv.getFiler());
-                } catch (IOException e) {
-                    throw new IllegalStateException(e);
+                if (!builder.methodSpecs.isEmpty()) {
+                    final JavaFile file =
+                            JavaFile.builder(super.getPackageName(elem, ""), builder.build()).indent("    ").build();
+                    try {
+                        file.writeTo(super.processingEnv.getFiler());
+                    } catch (IOException e) {
+                        super.printError("Could not write file: " + e.getMessage(), elem);
+                    }
                 }
             }
         }
@@ -112,7 +120,7 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
                                                  .addModifiers(Modifier.PUBLIC)
                                                  .addJavadoc("This is an auto-generated refinement of {@link $T}.",
                                                              this.typeUtils.erasure(annotatedClass.asType()))
-                                                 .addAnnotation(super.createAnnotation(annotatedClass));
+                                                 .addAnnotation(super.createGeneratedAnnotation(annotatedClass));
 
         for (String typeParameter : annotation.generics()) {
             builder.addTypeVariable(TypeVariableName.get(typeParameter));
@@ -126,9 +134,15 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
                                                GenerateRefinement annotation) {
         final List<? extends TypeParameterElement> typeParameters = annotatedClass.getTypeParameters();
         final Generic[] generics = annotation.parentGenerics();
-        final Map<String, Generic> typeMap;
 
-        assert typeParameters.size() == generics.length;
+        if (typeParameters.size() != generics.length) {
+            super.printError("The number of parent generics does not match the actual number of type parameters",
+                             annotatedClass,
+                             annotation);
+            return null;
+        }
+
+        final Map<String, Generic> typeMap;
 
         if (typeParameters.isEmpty()) {
             typeMap = Collections.emptyMap();
@@ -145,7 +159,7 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
     private void addInterfaces(TypeSpec.Builder builder, GenerateRefinement annotation) {
 
         for (Interface inter : annotation.interfaces()) {
-            final TypeMirror clazz = getClassValue(inter, Interface::clazz);
+            final TypeMirror clazz = super.getClassValue(inter, Interface::clazz);
             final Generic[] generics = inter.generics();
 
             builder.addSuperinterface(toTypeName(clazz, generics));
@@ -159,6 +173,7 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
 
         final Mapping[] typeMapping = annotation.typeMapping();
 
+        constructor:
         for (ExecutableElement constructor : ElementFilter.constructorsIn(annotatedClass.getEnclosedElements())) {
 
             final TypeName classType = ClassName.get(this.typeUtils.erasure(annotatedClass.asType()));
@@ -175,6 +190,12 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
                 final String name = p.getSimpleName().toString();
                 final TypeName typeName = mapTypeName(p.asType(), typeMapping, typeVarMap);
 
+                if (typeName == null) {
+                    super.printWarning("Constructor uses a dynamic type variable which are not supported. Skipping...",
+                                       constructor);
+                    continue constructor;
+                }
+
                 mBuilder.addParameter(typeName, name);
                 superJoiner.add(name);
                 docJoiner.add("$T");
@@ -190,6 +211,10 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
             mBuilder.addStatement(superJoiner.toString());
             builder.addMethod(mBuilder.build());
         }
+
+        if (builder.methodSpecs.isEmpty()) {
+            super.printError("No eligible constructors found", annotatedClass);
+        }
     }
 
     private TypeName mapTypeName(TypeMirror typeMirror, Mapping[] typeMapping, Map<String, Generic> typeVarMap) {
@@ -198,16 +223,18 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
             case ARRAY:
                 final ArrayType arrayMirror = (ArrayType) typeMirror;
                 final TypeName innerTypeName = mapTypeName(arrayMirror.getComponentType(), typeMapping, typeVarMap);
-                return ArrayTypeName.of(innerTypeName);
+                return innerTypeName == null ? null : ArrayTypeName.of(innerTypeName);
             case WILDCARD:
                 final WildcardType wildcardMirror = (WildcardType) typeMirror;
                 final TypeMirror extendsBound = wildcardMirror.getExtendsBound();
                 if (extendsBound != null) {
-                    return WildcardTypeName.subtypeOf(mapTypeName(extendsBound, typeMapping, typeVarMap));
+                    final TypeName extendsType = mapTypeName(extendsBound, typeMapping, typeVarMap);
+                    return extendsType == null ? null : WildcardTypeName.subtypeOf(extendsType);
                 }
                 final TypeMirror superBound = wildcardMirror.getSuperBound();
                 if (superBound != null) {
-                    return WildcardTypeName.supertypeOf(mapTypeName(superBound, typeMapping, typeVarMap));
+                    final TypeName superType = mapTypeName(superBound, typeMapping, typeVarMap);
+                    return superType == null ? null : WildcardTypeName.supertypeOf(superType);
                 }
                 return WildcardTypeName.get(wildcardMirror);
             case TYPEVAR:
@@ -215,20 +242,21 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
 
                 // a dynamic method type variable, not present in the class definition
                 if (generic == null) {
-                    throw new IllegalArgumentException("Cannot handle dynamic type variable " + typeMirror);
+                    return null;
                 }
 
                 final String value = generic.value();
                 if (value != null && !value.isEmpty()) {
                     return TypeVariableName.get(value);
                 } else {
-                    return toTypeName(getClassValue(generic, Generic::clazz), toTypeVariableNames(generic.generics()));
+                    return toTypeName(super.getClassValue(generic, Generic::clazz),
+                                      toTypeVariableNames(generic.generics()));
                 }
             case DECLARED:
                 for (Mapping mapping : typeMapping) {
-                    final TypeMirror from = getClassValue(mapping, Mapping::from);
+                    final TypeMirror from = super.getClassValue(mapping, Mapping::from);
                     if (this.typeUtils.isSameType(this.typeUtils.erasure(typeMirror), from)) {
-                        final TypeMirror to = getClassValue(mapping, Mapping::to);
+                        final TypeMirror to = super.getClassValue(mapping, Mapping::to);
                         final Generic[] generics = mapping.generics();
                         return toTypeName(to, generics);
                     }
@@ -284,7 +312,7 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
         if (!value.isEmpty()) {
             return TypeVariableName.get(value);
         } else {
-            final TypeMirror typeMirror = getClassValue(annotation, Generic::clazz);
+            final TypeMirror typeMirror = super.getClassValue(annotation, Generic::clazz);
             final String[] generics = annotation.generics();
 
             if (generics.length > 0) {
@@ -303,15 +331,6 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
         }
 
         return typeNames;
-    }
-
-    private <T> TypeMirror getClassValue(T obj, Function<T, Class<?>> extractor) {
-        try {
-            extractor.apply(obj);
-            throw new IllegalStateException("Expected MirroredTypeException");
-        } catch (MirroredTypeException mte) {
-            return mte.getTypeMirror();
-        }
     }
 
 }

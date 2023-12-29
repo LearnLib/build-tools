@@ -22,8 +22,8 @@ import java.lang.annotation.Target;
 /**
  * A markup annotation to declare that a method is available as an (embedded) DSL action.
  */
-@Target({ElementType.METHOD, ElementType.CONSTRUCTOR})
 @Retention(RetentionPolicy.SOURCE)
+@Target({ElementType.METHOD, ElementType.CONSTRUCTOR})
 public @interface Action {
 
     /**
@@ -35,3 +35,4 @@ public @interface Action {
     boolean isTerminating() default false;
 
 }
+

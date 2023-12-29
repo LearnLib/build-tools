@@ -12,22 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.learnlib.tooling.it.edsl;
+package de.learnlib.tooling.it.refinement;
 
-import de.learnlib.tooling.annotation.edsl.Action;
-import de.learnlib.tooling.annotation.edsl.GenerateEDSL;
+import de.learnlib.tooling.annotation.refinement.GenerateRefinement;
+import de.learnlib.tooling.annotation.refinement.Generic;
 
-/**
- * Simplified test based on an AutomataLib use-case.
- */
-@GenerateEDSL(packageName = "de.learnlib.tooling.processor.edsl",
-              name = "EmptyEDSLITResult",
-              syntax = "done",
-              isPublic = false)
-public class EmptyEDSLIT {
+@GenerateRefinement(name = "Error2RefinementITResult", generics = "O", parentGenerics = @Generic("O"))
+@GenerateRefinement(name = "Error2RefinementITResult2")
+public class Error2RefinementIT<I> {
 
-    @Action(isTerminating = true)
-    public String done() {
-        return "done";
-    }
+    public Error2RefinementIT(I i) {}
 }

@@ -27,10 +27,6 @@ final class DisablingBuilderITBuilder {
         this.b = de.learnlib.tooling.it.builder.DisablingBuilderIT.Defaults.b();
     }
 
-    int getA() {
-        return this.a;
-    }
-
     String getB() {
         return this.b;
     }

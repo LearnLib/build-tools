@@ -17,17 +17,20 @@ package de.learnlib.tooling.it.edsl;
 import de.learnlib.tooling.annotation.edsl.Action;
 import de.learnlib.tooling.annotation.edsl.GenerateEDSL;
 
-/**
- * Simplified test based on an AutomataLib use-case.
- */
-@GenerateEDSL(packageName = "de.learnlib.tooling.processor.edsl",
-              name = "EmptyEDSLITResult",
-              syntax = "done",
-              isPublic = false)
-public class EmptyEDSLIT {
+@GenerateEDSL(name = "TerminatingEDSLITResult", syntax = "(aaa a aa)*|aa")
+public class TerminatingEDSLIT {
+
+    @Action
+    public TerminatingEDSLIT() {}
+
+    @Action
+    public void a() {}
+
+    @Action
+    public void aa() {}
 
     @Action(isTerminating = true)
-    public String done() {
-        return "done";
+    public String aaa() {
+        return "aaa";
     }
 }

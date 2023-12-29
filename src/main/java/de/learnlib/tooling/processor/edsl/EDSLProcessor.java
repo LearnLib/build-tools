@@ -86,15 +86,24 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
             final boolean isClass = elem.getKind() == ElementKind.CLASS;
             final GenerateEDSL annotation = elem.getAnnotation(GenerateEDSL.class);
 
+            final String syntax = getExpandedSyntax(elem, annotation);
+            if (syntax == null) {
+                continue;
+            }
+
             final String name = annotation.name();
             final String pkg = super.getPackageName(elem, annotation.packageName());
             final Modifier[] modifiers = annotation.isPublic() ? new Modifier[] {Modifier.PUBLIC} : new Modifier[0];
-            final String syntax = getExpandedSyntax(elem, annotation);
-            final List<String> tokens = getTokens(syntax);
 
+            final List<String> tokens = getTokens(syntax);
             final Map<String, Character> token2Label = new HashMap<>();
             final Automaton automaton = getAutomaton(syntax, tokens, token2Label);
-            final Map<String, List<ExecutableElement>> token2Method = getDomainActionMap(elem, tokens);
+            final Map<String, List<ExecutableElement>> token2Method = getDomainActionMap(elem, tokens, annotation);
+
+            if (token2Method == null) {
+                continue;
+            }
+
             final Map<State, TypeSpec.Builder> state2Builder = new LinkedHashMap<>(); // ensure deterministic output
             final Map<State, MethodSpec> state2getter = new HashMap<>();
 
@@ -106,8 +115,10 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
                     FieldSpec.builder(sourceType, "delegate", Modifier.PRIVATE, Modifier.FINAL).build();
             targetBuilder.addField(delegate);
 
-            if (isClass) {
-                for (ExecutableElement c : ElementFilter.constructorsIn(getAnnotatedElements(elem))) {
+            final List<ExecutableElement> constructors = ElementFilter.constructorsIn(getAnnotatedElements(elem));
+
+            if (isClass && !constructors.isEmpty()) {
+                for (ExecutableElement c : constructors) {
                     final MethodSpec.Builder cBuilder = MethodSpec.constructorBuilder().addModifiers(modifiers);
                     final StringJoiner sj = new StringJoiner(", ", "$N = new $T(", ")");
                     for (VariableElement p : c.getParameters()) {
@@ -208,18 +219,22 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
 
                             final CodeBlock callDelegate = CodeBlock.of(sj.toString(), delegate, m.getSimpleName());
                             final Action ann = m.getAnnotation(Action.class);
-                            if (ann != null && ann.isTerminating()) {
-                                if (succ.isAccept()) {
-                                    final CodeBlock.Builder sBuilder = CodeBlock.builder();
-                                    if (m.getReturnType().getKind() != TypeKind.VOID) {
-                                        sBuilder.add(CodeBlock.of("return "));
-                                    }
-                                    sBuilder.add(callDelegate);
-                                    methodBuilder.addStatement(sBuilder.build())
-                                                 .returns(ParameterizedTypeName.get(m.getReturnType()));
-                                    builder.addMethod(methodBuilder.build());
+                            if (ann != null && ann.isTerminating() && succ.isAccept()) {
+                                final CodeBlock.Builder sBuilder = CodeBlock.builder();
+                                if (m.getReturnType().getKind() != TypeKind.VOID) {
+                                    sBuilder.add(CodeBlock.of("return "));
                                 }
+                                sBuilder.add(callDelegate);
+                                methodBuilder.addStatement(sBuilder.build())
+                                             .returns(ParameterizedTypeName.get(m.getReturnType()));
+                                builder.addMethod(methodBuilder.build());
                             } else {
+                                if (ann != null && ann.isTerminating()) {
+                                    super.printWarning(
+                                            "The annotated method is marked as terminating but does not terminate the regular expression. Treating it as non-terminating.",
+                                            m,
+                                            ann);
+                                }
                                 methodBuilder.addStatement(callDelegate)
                                              .addStatement("return $N()", getter)
                                              .returns(getter.returnType);
@@ -237,13 +252,12 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
                 }
             }
 
+            final JavaFile file = JavaFile.builder(pkg, targetBuilder.build()).indent("    ").build();
+
             try {
-                JavaFile.builder(pkg, targetBuilder.build())
-                        .indent("    ")
-                        .build()
-                        .writeTo(super.processingEnv.getFiler());
+                file.writeTo(super.processingEnv.getFiler());
             } catch (IOException ioe) {
-                throw new IllegalStateException(ioe);
+                super.printError("Could not write file: " + ioe.getMessage(), elem);
             }
         }
         return true;
@@ -261,8 +275,10 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
         }
 
         if (result.contains("<") || result.contains(">")) {
-            throw new IllegalArgumentException("Syntax '" + annotation.syntax() + "' in " + clazz +
-                                               " contains expressions that could not be substituted");
+            super.printError("The specified syntax contains expressions that could not be substituted",
+                             clazz,
+                             annotation);
+            return null;
         }
 
         return result;
@@ -293,7 +309,9 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
         return automaton;
     }
 
-    private Map<String, List<ExecutableElement>> getDomainActionMap(TypeElement clazz, List<String> token) {
+    private Map<String, List<ExecutableElement>> getDomainActionMap(TypeElement clazz,
+                                                                    List<String> token,
+                                                                    GenerateEDSL annotation) {
 
         final Set<String> tokensAsSet = new HashSet<>(token);
         final Map<String, List<ExecutableElement>> result = new HashMap<>();
@@ -307,7 +325,8 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
 
         if (!result.keySet().containsAll(tokensAsSet)) {
             tokensAsSet.removeAll(result.keySet());
-            throw new IllegalArgumentException("Could not find action for tokens: " + tokensAsSet + " in " + clazz);
+            super.printError("Could not find actions for tokens " + tokensAsSet, clazz, annotation);
+            return null;
         }
 
         return result;
@@ -326,7 +345,7 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
                                                  .addJavadoc(
                                                          "This is an auto-generated embedded domain-specific language for {@link $T}.\n",
                                                          super.processingEnv.getTypeUtils().erasure(element.asType()))
-                                                 .addAnnotation(super.createAnnotation(element));
+                                                 .addAnnotation(super.createGeneratedAnnotation(element));
 
         final DeclaredType clazz = (DeclaredType) element.asType();
 

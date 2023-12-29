@@ -22,10 +22,12 @@ import java.lang.annotation.Target;
 import dk.brics.automaton.RegExp;
 
 /**
- * Generate an (embedded) DSL from the target class or interface.
+ * Generate an (embedded) DSL from the target class, interface, or enum. If an annotated class contains one or multiple
+ * {@link Action}-annotated constructors, the (embedded) DSL object can be directly instantiated via the respective
+ * constructors parameters.
  */
-@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
+@Target(ElementType.TYPE)
 public @interface GenerateEDSL {
 
     /**
@@ -36,8 +38,8 @@ public @interface GenerateEDSL {
     String name();
 
     /**
-     * The fully qualified package name in which the generated (embedded)  DSL class will be placed. By default, the
-     * same package as the annotated class will be used.
+     * The fully qualified package name in which the generated (embedded) DSL class will be placed. By default, the same
+     * package as the annotated class will be used.
      *
      * @return the package name
      */
@@ -55,16 +57,18 @@ public @interface GenerateEDSL {
     String syntax();
 
     /**
-     * Specifies whether the generated (embedded) DSL class should be declared as {@code public}. If set to
-     * {@code false}, it will have package-private visibility.
+     * Returns whether the generated (embedded) DSL class should be declared as {@code public}. If set to {@code false},
+     * it will have package-private visibility.
      *
-     * @return whether the generated DSL class should be declared as {@code public}
+     * @return whether the generated (embedded) DSL class should be declared as {@code public}
      */
     boolean isPublic() default true;
 
     /**
-     * Named expressions that can be used in the embedded DSL syntax definition. Expressions should not contain other
-     * expressions.
+     * Returns the named expressions that can be used in the embedded DSL syntax definition. Expressions are substituted
+     * in-order, should you need nested expressions.
+     *
+     * @return the named expressions referenced in the syntax definition
      */
     Expr[] where() default {};
 }

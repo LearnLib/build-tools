@@ -24,8 +24,8 @@ import java.lang.annotation.Target;
  * {@link RetentionPolicy#CLASS} so that analysis tools (such as jacoco) can automatically ignore the generated files
  * without any additional configuration necessary.
  */
-@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.CLASS)
+@Target(ElementType.TYPE)
 public @interface Generated {
 
     /**

@@ -15,6 +15,7 @@
 package de.learnlib.tooling.it.refinement;
 
 import java.util.Collection;
+import java.util.function.Consumer;
 
 import de.learnlib.tooling.annotation.refinement.GenerateRefinement;
 import de.learnlib.tooling.annotation.refinement.Generic;
@@ -22,14 +23,19 @@ import de.learnlib.tooling.annotation.refinement.Mapping;
 
 @GenerateRefinement(name = "GenericRefinementITResult",
                     parentGenerics = {@Generic(clazz = String.class), @Generic(clazz = Boolean.class)},
-                    typeMapping = @Mapping(from = SuperInterface.class,
-                                           to = SubInterface.class,
-                                           generics = @Generic(clazz = String.class)))
+                    typeMapping = {@Mapping(from = SuperInterface.class,
+                                            to = SubInterface.class,
+                                            generics = @Generic(clazz = String.class)),
+                                   @Mapping(from = SubInterface.class,
+                                            to = SuperInterface.class,
+                                            generics = @Generic(clazz = String.class))})
 public class GenericRefinementIT<I, O> {
 
     public GenericRefinementIT(O a, SuperInterface<?>... b) {}
 
     @SafeVarargs
     public GenericRefinementIT(Collection<? extends SuperInterface<I>> a, I... b) {}
+
+    public GenericRefinementIT(Consumer<? super SubInterface<I>> a) {}
 
 }

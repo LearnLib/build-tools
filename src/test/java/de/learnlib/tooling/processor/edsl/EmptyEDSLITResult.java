@@ -16,8 +16,8 @@ class EmptyEDSLITResult {
 
     private EmptyEDSLITResult0 EmptyEDSLITResult0;
 
-    EmptyEDSLITResult() {
-        delegate = new EmptyEDSLIT();
+    EmptyEDSLITResult(EmptyEDSLIT orig) {
+        delegate = orig;
     }
 
     private EmptyEDSLITResult getEmptyEDSLITResult() {

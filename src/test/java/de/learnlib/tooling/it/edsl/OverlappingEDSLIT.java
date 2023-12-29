@@ -24,15 +24,18 @@ public class OverlappingEDSLIT {
     public OverlappingEDSLIT() {}
 
     @Action
-    public void a() {
-    }
+    public void a() {}
 
     @Action
     public String aa() {
-        return "aa";
+        return aa("aa");
+    }
+
+    @Action(isTerminating = true)
+    public String aa(String arg) {
+        return arg;
     }
 
     @Action
-    public void aaa() {
-    }
+    public void aaa() {}
 }

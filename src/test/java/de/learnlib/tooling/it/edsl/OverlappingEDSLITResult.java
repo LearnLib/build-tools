@@ -1,6 +1,7 @@
 package de.learnlib.tooling.it.edsl;
 
 import de.learnlib.tooling.annotation.Generated;
+import java.lang.String;
 
 /**
  * This is an auto-generated embedded domain-specific language for {@link OverlappingEDSLIT}.
@@ -66,6 +67,10 @@ public class OverlappingEDSLITResult {
         return getOverlappingEDSLITResult1();
     }
 
+    public String aa(String arg) {
+        return delegate.aa(arg);
+    }
+
     public final class OverlappingEDSLITResult0 {
         private OverlappingEDSLITResult0() {
         }
@@ -88,6 +93,10 @@ public class OverlappingEDSLITResult {
         public OverlappingEDSLITResult3 aa() {
             delegate.aa();
             return getOverlappingEDSLITResult3();
+        }
+
+        public String aa(String arg) {
+            return delegate.aa(arg);
         }
     }
 

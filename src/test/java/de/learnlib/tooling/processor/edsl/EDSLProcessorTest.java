@@ -28,12 +28,16 @@ import de.learnlib.tooling.it.edsl.DefaultEDSLITResult;
 import de.learnlib.tooling.it.edsl.EmptyEDSLIT;
 import de.learnlib.tooling.it.edsl.EnumEDSLIT;
 import de.learnlib.tooling.it.edsl.EnumEDSLITResult;
+import de.learnlib.tooling.it.edsl.Error2EDSLIT;
+import de.learnlib.tooling.it.edsl.ErrorEDSLIT;
 import de.learnlib.tooling.it.edsl.ExtendingEDSLIT;
 import de.learnlib.tooling.it.edsl.ExtendingEDSLITResult;
 import de.learnlib.tooling.it.edsl.InterfaceEDSLIT;
 import de.learnlib.tooling.it.edsl.InterfaceEDSLITResult;
 import de.learnlib.tooling.it.edsl.OverlappingEDSLIT;
 import de.learnlib.tooling.it.edsl.OverlappingEDSLITResult;
+import de.learnlib.tooling.it.edsl.TerminatingEDSLIT;
+import de.learnlib.tooling.it.edsl.TerminatingEDSLITResult;
 import org.mockito.Mockito;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -98,7 +102,7 @@ public class EDSLProcessorTest {
                .isEqualTo(Util.toJFO(EmptyEDSLITResult.class).getCharContent(false));
 
         // check that we can use the result as intended
-        final EmptyEDSLITResult fluent = new EmptyEDSLITResult();
+        final EmptyEDSLITResult fluent = new EmptyEDSLITResult(new EmptyEDSLIT());
         Assert.assertEquals(fluent.done(), "done");
     }
 
@@ -115,7 +119,28 @@ public class EDSLProcessorTest {
 
         // check that we can use the result as intended
         final OverlappingEDSLITResult fluent = new OverlappingEDSLITResult();
-        fluent.aaa().a().aa().aaa().a().aa();
+        final String arg = "arg";
+        final String result = fluent.aaa().a().aa().aaa().a().aa(arg);
+        Assert.assertEquals(result, arg);
+    }
+
+    @Test
+    public void testTerminatingEDSL() throws IOException {
+        final Compilation compilation =
+                Compiler.javac().withProcessors(new EDSLProcessor()).compile(Util.toJFO(TerminatingEDSLIT.class));
+
+        final CompilationSubject subject = CompilationSubject.assertThat(compilation);
+        subject.succeeded();
+        // method is used in two transitions
+        subject.hadWarningCount(2);
+        subject.hadWarningContaining("Treating it as non-terminating");
+        subject.generatedSourceFile(Util.toFQN(TerminatingEDSLITResult.class))
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(TerminatingEDSLITResult.class).getCharContent(false));
+
+        // check that we can use the result as intended
+        final TerminatingEDSLITResult fluent = new TerminatingEDSLITResult();
+        fluent.aaa().a().aa().aaa().a();
         fluent.aa();
     }
 
@@ -178,5 +203,27 @@ public class EDSLProcessorTest {
         Mockito.verify(mock, Mockito.times(2)).ping();
         Mockito.verify(mock, Mockito.times(2)).pong();
         Mockito.verify(mock, Mockito.times(1)).exit();
+    }
+
+    @Test
+    public void testErrorEDSL() {
+        final Compilation compilation =
+                Compiler.javac().withProcessors(new EDSLProcessor()).compile(Util.toJFO(ErrorEDSLIT.class));
+
+        final CompilationSubject subject = CompilationSubject.assertThat(compilation);
+        subject.failed();
+        subject.hadErrorCount(1);
+        subject.hadErrorContaining("Could not find actions");
+    }
+
+    @Test
+    public void testError2EDSL() {
+        final Compilation compilation =
+                Compiler.javac().withProcessors(new EDSLProcessor()).compile(Util.toJFO(Error2EDSLIT.class));
+
+        final CompilationSubject subject = CompilationSubject.assertThat(compilation);
+        subject.failed();
+        subject.hadErrorCount(1);
+        subject.hadErrorContaining("syntax contains expressions");
     }
 }

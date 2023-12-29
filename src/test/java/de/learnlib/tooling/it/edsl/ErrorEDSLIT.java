@@ -17,17 +17,13 @@ package de.learnlib.tooling.it.edsl;
 import de.learnlib.tooling.annotation.edsl.Action;
 import de.learnlib.tooling.annotation.edsl.GenerateEDSL;
 
-/**
- * Simplified test based on an AutomataLib use-case.
- */
-@GenerateEDSL(packageName = "de.learnlib.tooling.processor.edsl",
-              name = "EmptyEDSLITResult",
-              syntax = "done",
-              isPublic = false)
-public class EmptyEDSLIT {
+@GenerateEDSL(name = "ErrorEDSLITResult", syntax = "nonexisting")
+public class ErrorEDSLIT<I, SP, TP, A> {
+
+    @Action
+    ErrorEDSLIT() {}
 
     @Action(isTerminating = true)
-    public String done() {
-        return "done";
-    }
+    public void existing() {}
+
 }

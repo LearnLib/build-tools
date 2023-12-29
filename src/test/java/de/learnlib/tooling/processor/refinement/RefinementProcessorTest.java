@@ -20,6 +20,8 @@ import com.google.testing.compile.Compilation;
 import com.google.testing.compile.CompilationSubject;
 import com.google.testing.compile.Compiler;
 import de.learnlib.tooling.Util;
+import de.learnlib.tooling.it.refinement.Error2RefinementIT;
+import de.learnlib.tooling.it.refinement.ErrorRefinementIT;
 import de.learnlib.tooling.it.refinement.GenericRefinementIT;
 import de.learnlib.tooling.it.refinement.GenericRefinementITResult;
 import de.learnlib.tooling.it.refinement.MultiRefinementIT;
@@ -29,6 +31,8 @@ import de.learnlib.tooling.it.refinement.SimpleRefinementIT;
 import de.learnlib.tooling.it.refinement.SimpleRefinementITResult;
 import de.learnlib.tooling.it.refinement.SingleRefinementIT;
 import de.learnlib.tooling.it.refinement.SingleRefinementITResult;
+import de.learnlib.tooling.it.refinement.WarningRefinementIT;
+import de.learnlib.tooling.it.refinement.WarningRefinementITResult;
 import org.testng.annotations.Test;
 
 public class RefinementProcessorTest {
@@ -76,13 +80,54 @@ public class RefinementProcessorTest {
 
     @Test
     public void testGenericRefinement() throws IOException {
-        final Compilation compilation =
-                Compiler.javac().withProcessors(new RefinementProcessor()).compile(Util.toJFO(GenericRefinementIT.class));
+        final Compilation compilation = Compiler.javac()
+                                                .withProcessors(new RefinementProcessor())
+                                                .compile(Util.toJFO(GenericRefinementIT.class));
 
         final CompilationSubject subject = CompilationSubject.assertThat(compilation);
         subject.succeededWithoutWarnings();
         subject.generatedSourceFile(Util.toFQN(GenericRefinementITResult.class))
                .contentsAsUtf8String()
                .isEqualTo(Util.toJFO(GenericRefinementITResult.class).getCharContent(false));
+    }
+
+    @Test
+    public void testWarningRefinement() throws IOException {
+        final Compilation compilation = Compiler.javac()
+                                                .withProcessors(new RefinementProcessor())
+                                                .compile(Util.toJFO(WarningRefinementIT.class));
+
+        final CompilationSubject subject = CompilationSubject.assertThat(compilation);
+        subject.succeeded();
+        subject.hadWarningCount(1);
+        subject.hadWarningContaining("dynamic type variable");
+        subject.generatedSourceFile(Util.toFQN(WarningRefinementITResult.class))
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(WarningRefinementITResult.class).getCharContent(false));
+    }
+
+    @Test
+    public void testErrorRefinement() {
+        final Compilation compilation =
+                Compiler.javac().withProcessors(new RefinementProcessor()).compile(Util.toJFO(ErrorRefinementIT.class));
+
+        final CompilationSubject subject = CompilationSubject.assertThat(compilation);
+        subject.failed();
+        subject.hadWarningCount(1);
+        subject.hadWarningContaining("dynamic type variable");
+        subject.hadErrorCount(1);
+        subject.hadErrorContaining("No eligible constructors");
+    }
+
+    @Test
+    public void testError2Refinement() {
+        final Compilation compilation =
+                Compiler.javac().withProcessors(new RefinementProcessor()).compile(Util.toJFO(Error2RefinementIT.class));
+
+        final CompilationSubject subject = CompilationSubject.assertThat(compilation);
+        subject.failed();
+        // the non erroneous class should procduce no errors
+        subject.hadErrorCount(1);
+        subject.hadErrorContaining("number of");
     }
 }

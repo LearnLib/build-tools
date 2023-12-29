@@ -24,7 +24,7 @@ public class DisablingBuilderIT {
                      packageName = "de.learnlib.tooling.processor.builder",
                      setterPrefix = GenerateBuilder.SUPPRESS,
                      builderPublic = false)
-    public DisablingBuilderIT(@Option(withName = GenerateBuilder.SUPPRESS, requiredOnInstantiation = true) int a,
+    public DisablingBuilderIT(@Option(name = GenerateBuilder.SUPPRESS, requiredOnInstantiation = true) int a,
                               @Option(withName = GenerateBuilder.SUPPRESS) String b,
                               SuperInterface<?> c,
                               @Option(getterName = GenerateBuilder.SUPPRESS,

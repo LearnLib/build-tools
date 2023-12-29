@@ -29,7 +29,6 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 
@@ -56,13 +55,13 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 
-        for (Element e : roundEnv.getElementsAnnotatedWith(GenerateBuilder.class)) {
+        for (Element elem : roundEnv.getElementsAnnotatedWith(GenerateBuilder.class)) {
 
-            final ExecutableElement elem = (ExecutableElement) e;
-            final GenerateBuilder annotation = elem.getAnnotation(GenerateBuilder.class);
+            final ExecutableElement constructor = (ExecutableElement) elem;
+            final GenerateBuilder annotation = constructor.getAnnotation(GenerateBuilder.class);
 
-            final String name = getBuilderName(elem, annotation);
-            final String pkg = super.getPackageName(elem, annotation.packageName());
+            final String name = getBuilderName(constructor, annotation);
+            final String pkg = super.getPackageName(constructor, annotation.packageName());
             final String create = annotation.createName();
             final Iterable<Modifier> modifiers =
                     annotation.builderPublic() ? Collections.singleton(Modifier.PUBLIC) : Collections.emptyList();
@@ -76,7 +75,7 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
             final boolean isSetSuppressed = GenerateBuilder.SUPPRESS.equals(annotation.setterPrefix());
             final boolean isWithSuppressed = GenerateBuilder.SUPPRESS.equals(annotation.withPrefix());
 
-            final Element clazz = elem.getEnclosingElement();
+            final Element clazz = constructor.getEnclosingElement();
             assert clazz.getKind() == ElementKind.CLASS;
 
             final ClassName builderName = ClassName.get(pkg, name);
@@ -88,17 +87,17 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
             final MethodSpec.Builder createBuilder = MethodSpec.methodBuilder(create)
                                                                .addModifiers(modifiers)
                                                                .returns(targetType)
-                                                               .addExceptions(elem.getThrownTypes()
-                                                                                  .stream()
-                                                                                  .map(TypeName::get)
-                                                                                  .collect(Collectors.toList()));
+                                                               .addExceptions(constructor.getThrownTypes()
+                                                                                         .stream()
+                                                                                         .map(TypeName::get)
+                                                                                         .collect(Collectors.toList()));
 
-            final List<? extends VariableElement> params = elem.getParameters();
+            final List<? extends VariableElement> params = constructor.getParameters();
             final StringJoiner returnJoiner = new StringJoiner(", ", "return new $T(", ")");
 
             for (int i = 0; i < params.size(); i++) {
                 final VariableElement ve = params.get(i);
-                final boolean isVarArgs = elem.isVarArgs() && i == params.size() - 1;
+                final boolean isVarArgs = constructor.isVarArgs() && i == params.size() - 1;
                 final Option paramAnnotation = ve.getAnnotation(Option.class);
                 final boolean isFieldSuppressed;
                 final String fieldName;
@@ -203,13 +202,12 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
             classBuilder.addMethod(constructorBuilder.build());
             classBuilder.addMethod(createBuilder.build());
 
+            final JavaFile file = JavaFile.builder(pkg, classBuilder.build()).indent("    ").build();
+
             try {
-                JavaFile.builder(pkg, classBuilder.build())
-                        .indent("    ")
-                        .build()
-                        .writeTo(super.processingEnv.getFiler());
-            } catch (IOException ioe) {
-                throw new IllegalStateException(ioe);
+                file.writeTo(super.processingEnv.getFiler());
+            } catch (IOException e) {
+                super.printError("Could not write file: " + e.getMessage(), constructor);
             }
         }
         return true;
@@ -243,14 +241,9 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
     }
 
     private TypeElement getDefaultsValue(GenerateBuilder annotation) {
-        try {
-            annotation.defaults();
-            throw new IllegalStateException("Expected MirroredTypeException");
-        } catch (MirroredTypeException mte) {
-            final TypeMirror mirror = mte.getTypeMirror();
-            final DeclaredType dt = (DeclaredType) mirror;
-            return (TypeElement) dt.asElement();
-        }
+        final TypeMirror mirror = super.getClassValue(annotation, GenerateBuilder::defaults);
+        final DeclaredType dt = (DeclaredType) mirror;
+        return (TypeElement) dt.asElement();
     }
 
     private TypeSpec.Builder createBuilder(Element element, GenerateBuilder generateBuilder, ClassName name) {
@@ -258,7 +251,7 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
                                                  .addJavadoc("This is an auto-generated builder for {@link $T}.\n",
                                                              super.processingEnv.getTypeUtils()
                                                                                 .erasure(element.asType()))
-                                                 .addAnnotation(super.createAnnotation(element));
+                                                 .addAnnotation(super.createGeneratedAnnotation(element));
 
         final DeclaredType clazz = (DeclaredType) element.asType();
 

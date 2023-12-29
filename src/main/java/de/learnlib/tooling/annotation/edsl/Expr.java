@@ -21,17 +21,21 @@ import java.lang.annotation.Target;
 /**
  * A named expression, to be used in a {@link GenerateEDSL#syntax()} definition.
  */
-@Target({})
 @Retention(RetentionPolicy.SOURCE)
+@Target({})
 public @interface Expr {
 
     /**
-     * The name of this expression.
+     * Returns the name of this expression.
+     *
+     * @return the name of this expression
      */
     String name();
 
     /**
-     * The definition of this expression. The syntax follows that of {@link GenerateEDSL#syntax()}.
+     * Returns the syntax definition of this expression. The syntax follows that of {@link GenerateEDSL#syntax()}.
+     *
+     * @return the syntax of this expression
      */
     String syntax();
 

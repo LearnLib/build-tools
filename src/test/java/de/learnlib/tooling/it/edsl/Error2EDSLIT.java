@@ -15,19 +15,21 @@
 package de.learnlib.tooling.it.edsl;
 
 import de.learnlib.tooling.annotation.edsl.Action;
+import de.learnlib.tooling.annotation.edsl.Expr;
 import de.learnlib.tooling.annotation.edsl.GenerateEDSL;
 
-/**
- * Simplified test based on an AutomataLib use-case.
- */
-@GenerateEDSL(packageName = "de.learnlib.tooling.processor.edsl",
-              name = "EmptyEDSLITResult",
-              syntax = "done",
-              isPublic = false)
-public class EmptyEDSLIT {
+@GenerateEDSL(name = "ErrorEDSLITResult",
+              syntax = "<subexpression> create",
+              where = @Expr(name = "subexp", syntax = "action"))
+public class Error2EDSLIT<I, SP, TP, A> {
+
+    @Action
+    Error2EDSLIT() {}
+
+    @Action
+    public void action() {}
 
     @Action(isTerminating = true)
-    public String done() {
-        return "done";
-    }
+    public void create() {}
+
 }

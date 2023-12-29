@@ -5,6 +5,7 @@ import java.lang.Boolean;
 import java.lang.SafeVarargs;
 import java.lang.String;
 import java.util.Collection;
+import java.util.function.Consumer;
 
 /**
  * This is an auto-generated refinement of {@link GenericRefinementIT}.
@@ -27,5 +28,12 @@ public class GenericRefinementITResult extends GenericRefinementIT<String, Boole
      */
     public GenericRefinementITResult(Collection<? extends SubInterface<String>> a, String... b) {
         super(a, b);
+    }
+
+    /**
+     * This is an auto-generated constructor calling {@link GenericRefinementIT#GenericRefinementIT(Consumer)}.
+     */
+    public GenericRefinementITResult(Consumer<? super SuperInterface<String>> a) {
+        super(a);
     }
 }

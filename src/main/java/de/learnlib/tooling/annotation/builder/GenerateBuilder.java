@@ -77,12 +77,16 @@ public @interface GenerateBuilder {
     Class<?> defaults() default Void.class;
 
     /**
-     * Whether or not the generated builder is a <code>public</code> class (<code>true</code> by default).
+     * Returns whether the generated builder should be a <code>public</code> class.
+     *
+     * @return whether the generated builder should be public
      */
     boolean builderPublic() default true;
 
     /**
-     * Whether or not the generated builder is a <code>final</code> class (<code>true</code> by default).
+     * Returns whether the generated builder should be a <code>final</code> class.
+     *
+     * @return whether the generated builder should be final
      */
     boolean builderFinal() default true;
 
