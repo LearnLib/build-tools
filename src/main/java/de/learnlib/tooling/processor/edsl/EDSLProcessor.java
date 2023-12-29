@@ -17,6 +17,7 @@ package de.learnlib.tooling.processor.edsl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -104,6 +105,8 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
                 continue;
             }
 
+            final Collection<State> relevantStates =
+                    filterIrrelevantStates(automaton, tokens, token2Label, token2Method);
             final Map<State, TypeSpec.Builder> state2Builder = new LinkedHashMap<>(); // ensure deterministic output
             final Map<State, MethodSpec> state2getter = new HashMap<>();
 
@@ -140,7 +143,7 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
 
             // generate state classes
             int id = 0;
-            for (State s : automaton.getStates()) {
+            for (State s : relevantStates) {
                 // the initial state is represented by the class itself
                 final boolean isInit = Objects.equals(s, automaton.getInitialState());
                 final Builder cBuilder;
@@ -187,7 +190,7 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
             }
 
             // generate adjacency
-            for (State state : automaton.getStates()) {
+            for (State state : relevantStates) {
                 final Builder builder = state2Builder.get(state);
                 for (Entry<String, Character> entry : token2Label.entrySet()) {
                     final String token = entry.getKey();
@@ -307,6 +310,47 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
         assert automaton.isDeterministic();
 
         return automaton;
+    }
+
+    /*
+     * A state is relevant if it is either
+     * - the initial state
+     * - a non-accepting state
+     * - has an incoming, non-terminating transition
+     */
+    private Collection<State> filterIrrelevantStates(Automaton automaton,
+                                                     Collection<String> tokens,
+                                                     Map<String, Character> token2labels,
+                                                     Map<String, List<ExecutableElement>> token2Methods) {
+        final Set<State> states = automaton.getStates();
+        final List<State> result = new ArrayList<>(states.size());
+
+        states:
+        for (State state : states) {
+            if (Objects.equals(state, automaton.getInitialState())) {
+                result.add(state);
+            } else if (!state.isAccept()) {
+                result.add(state);
+            } else {
+                for (String token : tokens) {
+                    for (ExecutableElement m : token2Methods.getOrDefault(token, Collections.emptyList())) {
+                        final Action ann = m.getAnnotation(Action.class);
+                        if (ann != null && !ann.isTerminating()) {
+                            final Character label = token2labels.get(token);
+                            assert label != null;
+                            for (State s : states) {
+                                if (state.equals(s.step(label))) {
+                                    result.add(state);
+                                    continue states;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     private Map<String, List<ExecutableElement>> getDomainActionMap(TypeElement clazz,

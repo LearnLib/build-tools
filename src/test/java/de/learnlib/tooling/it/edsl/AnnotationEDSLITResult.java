@@ -15,8 +15,6 @@ public class AnnotationEDSLITResult {
 
     private AnnotationEDSLITResult0 AnnotationEDSLITResult0;
 
-    private AnnotationEDSLITResult1 AnnotationEDSLITResult1;
-
     public AnnotationEDSLITResult(AnnotationEDSLIT orig) {
         delegate = orig;
     }
@@ -30,13 +28,6 @@ public class AnnotationEDSLITResult {
             AnnotationEDSLITResult0 = new AnnotationEDSLITResult0();
         }
         return AnnotationEDSLITResult0;
-    }
-
-    private AnnotationEDSLITResult1 getAnnotationEDSLITResult1() {
-        if (AnnotationEDSLITResult1 == null) {
-            AnnotationEDSLITResult1 = new AnnotationEDSLITResult1();
-        }
-        return AnnotationEDSLITResult1;
     }
 
     public String exit() {
@@ -55,11 +46,6 @@ public class AnnotationEDSLITResult {
         public AnnotationEDSLITResult pong() {
             delegate.pong();
             return getAnnotationEDSLITResult();
-        }
-    }
-
-    public final class AnnotationEDSLITResult1 {
-        private AnnotationEDSLITResult1() {
         }
     }
 }

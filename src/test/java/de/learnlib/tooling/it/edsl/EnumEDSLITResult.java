@@ -14,8 +14,6 @@ public class EnumEDSLITResult {
 
     private EnumEDSLITResult0 EnumEDSLITResult0;
 
-    private EnumEDSLITResult1 EnumEDSLITResult1;
-
     public EnumEDSLITResult(EnumEDSLIT orig) {
         delegate = orig;
     }
@@ -29,13 +27,6 @@ public class EnumEDSLITResult {
             EnumEDSLITResult0 = new EnumEDSLITResult0();
         }
         return EnumEDSLITResult0;
-    }
-
-    private EnumEDSLITResult1 getEnumEDSLITResult1() {
-        if (EnumEDSLITResult1 == null) {
-            EnumEDSLITResult1 = new EnumEDSLITResult1();
-        }
-        return EnumEDSLITResult1;
     }
 
     public void exit() {
@@ -54,11 +45,6 @@ public class EnumEDSLITResult {
         public EnumEDSLITResult pong() {
             delegate.pong();
             return getEnumEDSLITResult();
-        }
-    }
-
-    public final class EnumEDSLITResult1 {
-        private EnumEDSLITResult1() {
         }
     }
 }

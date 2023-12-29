@@ -14,8 +14,6 @@ public class InterfaceEDSLITResult {
 
     private InterfaceEDSLITResult0 InterfaceEDSLITResult0;
 
-    private InterfaceEDSLITResult1 InterfaceEDSLITResult1;
-
     public InterfaceEDSLITResult(InterfaceEDSLIT orig) {
         delegate = orig;
     }
@@ -29,13 +27,6 @@ public class InterfaceEDSLITResult {
             InterfaceEDSLITResult0 = new InterfaceEDSLITResult0();
         }
         return InterfaceEDSLITResult0;
-    }
-
-    private InterfaceEDSLITResult1 getInterfaceEDSLITResult1() {
-        if (InterfaceEDSLITResult1 == null) {
-            InterfaceEDSLITResult1 = new InterfaceEDSLITResult1();
-        }
-        return InterfaceEDSLITResult1;
     }
 
     public void exit() {
@@ -54,11 +45,6 @@ public class InterfaceEDSLITResult {
         public InterfaceEDSLITResult pong() {
             delegate.pong();
             return getInterfaceEDSLITResult();
-        }
-    }
-
-    public final class InterfaceEDSLITResult1 {
-        private InterfaceEDSLITResult1() {
         }
     }
 }

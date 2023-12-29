@@ -19,8 +19,6 @@ public class DefaultEDSLITResult<I, SP, TP, A> {
 
     private DefaultEDSLITResult1 DefaultEDSLITResult1;
 
-    private DefaultEDSLITResult2 DefaultEDSLITResult2;
-
     public DefaultEDSLITResult(A a) {
         delegate = new DefaultEDSLIT<I, SP, TP, A>(a);
     }
@@ -43,13 +41,6 @@ public class DefaultEDSLITResult<I, SP, TP, A> {
         return DefaultEDSLITResult1;
     }
 
-    private DefaultEDSLITResult2 getDefaultEDSLITResult2() {
-        if (DefaultEDSLITResult2 == null) {
-            DefaultEDSLITResult2 = new DefaultEDSLITResult2();
-        }
-        return DefaultEDSLITResult2;
-    }
-
     public DefaultEDSLITResult<I, SP, TP, A> withStateProperty(SP stateProperty, Object stateId) {
         delegate.withStateProperty(stateProperty, stateId);
         return getDefaultEDSLITResult();
@@ -64,34 +55,29 @@ public class DefaultEDSLITResult<I, SP, TP, A> {
         return getDefaultEDSLITResult();
     }
 
-    public DefaultEDSLITResult1 from(Object stateId) {
+    public DefaultEDSLITResult0 from(Object stateId) {
         delegate.from(stateId);
-        return getDefaultEDSLITResult1();
+        return getDefaultEDSLITResult0();
     }
 
     public final class DefaultEDSLITResult0 {
         private DefaultEDSLITResult0() {
         }
+
+        public DefaultEDSLITResult1 on(I input) throws Exception {
+            delegate.on(input);
+            return getDefaultEDSLITResult1();
+        }
+
+        @SafeVarargs
+        public final DefaultEDSLITResult1 on(I firstInput, I... otherInputs) {
+            delegate.on(firstInput, otherInputs);
+            return getDefaultEDSLITResult1();
+        }
     }
 
     public final class DefaultEDSLITResult1 {
         private DefaultEDSLITResult1() {
-        }
-
-        public DefaultEDSLITResult2 on(I input) throws Exception {
-            delegate.on(input);
-            return getDefaultEDSLITResult2();
-        }
-
-        @SafeVarargs
-        public final DefaultEDSLITResult2 on(I firstInput, I... otherInputs) {
-            delegate.on(firstInput, otherInputs);
-            return getDefaultEDSLITResult2();
-        }
-    }
-
-    public final class DefaultEDSLITResult2 {
-        private DefaultEDSLITResult2() {
         }
 
         public DefaultEDSLITResult<I, SP, TP, A> withStateProperty(SP stateProperty,
@@ -100,14 +86,14 @@ public class DefaultEDSLITResult<I, SP, TP, A> {
             return getDefaultEDSLITResult();
         }
 
-        public DefaultEDSLITResult2 withProperty(TP transProp) {
+        public DefaultEDSLITResult1 withProperty(TP transProp) {
             delegate.withProperty(transProp);
-            return getDefaultEDSLITResult2();
+            return getDefaultEDSLITResult1();
         }
 
-        public DefaultEDSLITResult2 loop() {
+        public DefaultEDSLITResult1 loop() {
             delegate.loop();
-            return getDefaultEDSLITResult2();
+            return getDefaultEDSLITResult1();
         }
 
         public A create() {
@@ -119,25 +105,25 @@ public class DefaultEDSLITResult<I, SP, TP, A> {
             return getDefaultEDSLITResult();
         }
 
-        public DefaultEDSLITResult1 from(Object stateId) {
+        public DefaultEDSLITResult0 from(Object stateId) {
             delegate.from(stateId);
+            return getDefaultEDSLITResult0();
+        }
+
+        public DefaultEDSLITResult1 to(Object stateId) {
+            delegate.to(stateId);
             return getDefaultEDSLITResult1();
         }
 
-        public DefaultEDSLITResult2 to(Object stateId) {
-            delegate.to(stateId);
-            return getDefaultEDSLITResult2();
-        }
-
-        public DefaultEDSLITResult2 on(I input) throws Exception {
+        public DefaultEDSLITResult1 on(I input) throws Exception {
             delegate.on(input);
-            return getDefaultEDSLITResult2();
+            return getDefaultEDSLITResult1();
         }
 
         @SafeVarargs
-        public final DefaultEDSLITResult2 on(I firstInput, I... otherInputs) {
+        public final DefaultEDSLITResult1 on(I firstInput, I... otherInputs) {
             delegate.on(firstInput, otherInputs);
-            return getDefaultEDSLITResult2();
+            return getDefaultEDSLITResult1();
         }
     }
 }

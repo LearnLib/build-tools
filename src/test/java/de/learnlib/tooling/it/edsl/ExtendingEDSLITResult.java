@@ -30,8 +30,6 @@ public class ExtendingEDSLITResult<I, A extends SuperInterface<?>> {
 
     private ExtendingEDSLITResult6 ExtendingEDSLITResult6;
 
-    private ExtendingEDSLITResult7 ExtendingEDSLITResult7;
-
     public ExtendingEDSLITResult(A automaton) {
         delegate = new ExtendingEDSLIT<I, A>(automaton);
     }
@@ -89,13 +87,6 @@ public class ExtendingEDSLITResult<I, A extends SuperInterface<?>> {
         return ExtendingEDSLITResult6;
     }
 
-    private ExtendingEDSLITResult7 getExtendingEDSLITResult7() {
-        if (ExtendingEDSLITResult7 == null) {
-            ExtendingEDSLITResult7 = new ExtendingEDSLITResult7();
-        }
-        return ExtendingEDSLITResult7;
-    }
-
     public ExtendingEDSLITResult<I, A> withAccepting(Object stateId) {
         delegate.withAccepting(stateId);
         return getExtendingEDSLITResult();
@@ -129,19 +120,35 @@ public class ExtendingEDSLITResult<I, A extends SuperInterface<?>> {
             return delegate.create();
         }
 
-        public ExtendingEDSLITResult3 from(Object stateId) {
+        public ExtendingEDSLITResult2 from(Object stateId) {
             delegate.from(stateId);
-            return getExtendingEDSLITResult3();
+            return getExtendingEDSLITResult2();
         }
 
-        public ExtendingEDSLITResult3 from(Object firstStateId, Object... otherStateIds) {
+        public ExtendingEDSLITResult2 from(Object firstStateId, Object... otherStateIds) {
             delegate.from(firstStateId, otherStateIds);
-            return getExtendingEDSLITResult3();
+            return getExtendingEDSLITResult2();
         }
     }
 
     public final class ExtendingEDSLITResult1 {
         private ExtendingEDSLITResult1() {
+        }
+
+        public ExtendingEDSLITResult3 on(I input) throws Exception {
+            delegate.on(input);
+            return getExtendingEDSLITResult3();
+        }
+
+        @SafeVarargs
+        public final ExtendingEDSLITResult3 on(I firstInput, I... otherInputs) {
+            delegate.on(firstInput, otherInputs);
+            return getExtendingEDSLITResult3();
+        }
+    }
+
+    public final class ExtendingEDSLITResult2 {
+        private ExtendingEDSLITResult2() {
         }
 
         public ExtendingEDSLITResult4 on(I input) throws Exception {
@@ -156,23 +163,17 @@ public class ExtendingEDSLITResult<I, A extends SuperInterface<?>> {
         }
     }
 
-    public final class ExtendingEDSLITResult2 {
-        private ExtendingEDSLITResult2() {
-        }
-    }
-
     public final class ExtendingEDSLITResult3 {
         private ExtendingEDSLITResult3() {
         }
 
-        public ExtendingEDSLITResult5 on(I input) throws Exception {
-            delegate.on(input);
+        public ExtendingEDSLITResult5 loop() {
+            delegate.loop();
             return getExtendingEDSLITResult5();
         }
 
-        @SafeVarargs
-        public final ExtendingEDSLITResult5 on(I firstInput, I... otherInputs) {
-            delegate.on(firstInput, otherInputs);
+        public ExtendingEDSLITResult5 to(Object stateId) {
+            delegate.to(stateId);
             return getExtendingEDSLITResult5();
         }
     }
@@ -196,21 +197,6 @@ public class ExtendingEDSLITResult<I, A extends SuperInterface<?>> {
         private ExtendingEDSLITResult5() {
         }
 
-        public ExtendingEDSLITResult7 loop() {
-            delegate.loop();
-            return getExtendingEDSLITResult7();
-        }
-
-        public ExtendingEDSLITResult7 to(Object stateId) {
-            delegate.to(stateId);
-            return getExtendingEDSLITResult7();
-        }
-    }
-
-    public final class ExtendingEDSLITResult6 {
-        private ExtendingEDSLITResult6() {
-        }
-
         public ExtendingEDSLITResult<I, A> withAccepting(Object stateId) {
             delegate.withAccepting(stateId);
             return getExtendingEDSLITResult();
@@ -231,20 +217,20 @@ public class ExtendingEDSLITResult<I, A extends SuperInterface<?>> {
             return getExtendingEDSLITResult1();
         }
 
-        public ExtendingEDSLITResult4 on(I input) throws Exception {
+        public ExtendingEDSLITResult3 on(I input) throws Exception {
             delegate.on(input);
-            return getExtendingEDSLITResult4();
+            return getExtendingEDSLITResult3();
         }
 
         @SafeVarargs
-        public final ExtendingEDSLITResult4 on(I firstInput, I... otherInputs) {
+        public final ExtendingEDSLITResult3 on(I firstInput, I... otherInputs) {
             delegate.on(firstInput, otherInputs);
-            return getExtendingEDSLITResult4();
+            return getExtendingEDSLITResult3();
         }
     }
 
-    public final class ExtendingEDSLITResult7 {
-        private ExtendingEDSLITResult7() {
+    public final class ExtendingEDSLITResult6 {
+        private ExtendingEDSLITResult6() {
         }
 
         public ExtendingEDSLITResult0 withAccepting(Object stateId) {
@@ -256,25 +242,25 @@ public class ExtendingEDSLITResult<I, A extends SuperInterface<?>> {
             return delegate.create();
         }
 
-        public ExtendingEDSLITResult3 from(Object stateId) {
+        public ExtendingEDSLITResult2 from(Object stateId) {
             delegate.from(stateId);
-            return getExtendingEDSLITResult3();
+            return getExtendingEDSLITResult2();
         }
 
-        public ExtendingEDSLITResult3 from(Object firstStateId, Object... otherStateIds) {
+        public ExtendingEDSLITResult2 from(Object firstStateId, Object... otherStateIds) {
             delegate.from(firstStateId, otherStateIds);
-            return getExtendingEDSLITResult3();
+            return getExtendingEDSLITResult2();
         }
 
-        public ExtendingEDSLITResult5 on(I input) throws Exception {
+        public ExtendingEDSLITResult4 on(I input) throws Exception {
             delegate.on(input);
-            return getExtendingEDSLITResult5();
+            return getExtendingEDSLITResult4();
         }
 
         @SafeVarargs
-        public final ExtendingEDSLITResult5 on(I firstInput, I... otherInputs) {
+        public final ExtendingEDSLITResult4 on(I firstInput, I... otherInputs) {
             delegate.on(firstInput, otherInputs);
-            return getExtendingEDSLITResult5();
+            return getExtendingEDSLITResult4();
         }
     }
 }

@@ -14,8 +14,6 @@ import java.lang.String;
 class EmptyEDSLITResult {
     private final EmptyEDSLIT delegate;
 
-    private EmptyEDSLITResult0 EmptyEDSLITResult0;
-
     EmptyEDSLITResult(EmptyEDSLIT orig) {
         delegate = orig;
     }
@@ -24,19 +22,7 @@ class EmptyEDSLITResult {
         return this;
     }
 
-    private EmptyEDSLITResult0 getEmptyEDSLITResult0() {
-        if (EmptyEDSLITResult0 == null) {
-            EmptyEDSLITResult0 = new EmptyEDSLITResult0();
-        }
-        return EmptyEDSLITResult0;
-    }
-
     String done() {
         return delegate.done();
-    }
-
-    final class EmptyEDSLITResult0 {
-        private EmptyEDSLITResult0() {
-        }
     }
 }
