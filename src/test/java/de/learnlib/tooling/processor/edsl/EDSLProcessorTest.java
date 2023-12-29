@@ -21,13 +21,20 @@ import com.google.testing.compile.Compilation;
 import com.google.testing.compile.CompilationSubject;
 import com.google.testing.compile.Compiler;
 import de.learnlib.tooling.Util;
+import de.learnlib.tooling.it.edsl.AnnotationEDSLIT;
+import de.learnlib.tooling.it.edsl.AnnotationEDSLITResult;
 import de.learnlib.tooling.it.edsl.DefaultEDSLIT;
 import de.learnlib.tooling.it.edsl.DefaultEDSLITResult;
 import de.learnlib.tooling.it.edsl.EmptyEDSLIT;
+import de.learnlib.tooling.it.edsl.EnumEDSLIT;
+import de.learnlib.tooling.it.edsl.EnumEDSLITResult;
 import de.learnlib.tooling.it.edsl.ExtendingEDSLIT;
 import de.learnlib.tooling.it.edsl.ExtendingEDSLITResult;
+import de.learnlib.tooling.it.edsl.InterfaceEDSLIT;
+import de.learnlib.tooling.it.edsl.InterfaceEDSLITResult;
 import de.learnlib.tooling.it.edsl.OverlappingEDSLIT;
 import de.learnlib.tooling.it.edsl.OverlappingEDSLITResult;
+import org.mockito.Mockito;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -81,7 +88,6 @@ public class EDSLProcessorTest {
 
     @Test
     public void testEmptyEDSL() throws IOException {
-        // we need to compile both files, otherwise the annotations are missing on the super classes
         final Compilation compilation =
                 Compiler.javac().withProcessors(new EDSLProcessor()).compile(Util.toJFO(EmptyEDSLIT.class));
 
@@ -92,13 +98,12 @@ public class EDSLProcessorTest {
                .isEqualTo(Util.toJFO(EmptyEDSLITResult.class).getCharContent(false));
 
         // check that we can use the result as intended
-        EmptyEDSLITResult fluent = new EmptyEDSLITResult();
+        final EmptyEDSLITResult fluent = new EmptyEDSLITResult();
         Assert.assertEquals(fluent.done(), "done");
     }
 
     @Test
     public void testOverlappingEDSL() throws IOException {
-        // we need to compile both files, otherwise the annotations are missing on the super classes
         final Compilation compilation =
                 Compiler.javac().withProcessors(new EDSLProcessor()).compile(Util.toJFO(OverlappingEDSLIT.class));
 
@@ -109,8 +114,69 @@ public class EDSLProcessorTest {
                .isEqualTo(Util.toJFO(OverlappingEDSLITResult.class).getCharContent(false));
 
         // check that we can use the result as intended
-        OverlappingEDSLITResult fluent = new OverlappingEDSLITResult();
+        final OverlappingEDSLITResult fluent = new OverlappingEDSLITResult();
         fluent.aaa().a().aa().aaa().a().aa();
         fluent.aa();
+    }
+
+    @Test
+    public void testEnumEDSL() throws IOException {
+        final Compilation compilation =
+                Compiler.javac().withProcessors(new EDSLProcessor()).compile(Util.toJFO(EnumEDSLIT.class));
+
+        final CompilationSubject subject = CompilationSubject.assertThat(compilation);
+        subject.succeededWithoutWarnings();
+        subject.generatedSourceFile(Util.toFQN(EnumEDSLITResult.class))
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(EnumEDSLITResult.class).getCharContent(false));
+
+        // check that we can use the result as intended
+        final EnumEDSLITResult fluent = new EnumEDSLITResult(EnumEDSLIT.ENUM_EDSLIT);
+        fluent.ping().pong().ping().pong().exit();
+        fluent.exit();
+    }
+
+    @Test
+    public void testInterfaceEDSL() throws IOException {
+        final Compilation compilation =
+                Compiler.javac().withProcessors(new EDSLProcessor()).compile(Util.toJFO(InterfaceEDSLIT.class));
+
+        final CompilationSubject subject = CompilationSubject.assertThat(compilation);
+        subject.succeededWithoutWarnings();
+        subject.generatedSourceFile(Util.toFQN(InterfaceEDSLITResult.class))
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(InterfaceEDSLITResult.class).getCharContent(false));
+
+        final InterfaceEDSLIT mock = Mockito.mock(InterfaceEDSLIT.class);
+
+        // check that we can use the result as intended
+        final InterfaceEDSLITResult fluent = new InterfaceEDSLITResult(mock);
+        fluent.ping().pong().ping().pong().exit();
+
+        Mockito.verify(mock, Mockito.times(2)).ping();
+        Mockito.verify(mock, Mockito.times(2)).pong();
+        Mockito.verify(mock, Mockito.times(1)).exit();
+    }
+
+    @Test
+    public void testAnnotationEDSL() throws IOException {
+        final Compilation compilation =
+                Compiler.javac().withProcessors(new EDSLProcessor()).compile(Util.toJFO(AnnotationEDSLIT.class));
+
+        final CompilationSubject subject = CompilationSubject.assertThat(compilation);
+        subject.succeededWithoutWarnings();
+        subject.generatedSourceFile(Util.toFQN(AnnotationEDSLITResult.class))
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(AnnotationEDSLITResult.class).getCharContent(false));
+
+        final AnnotationEDSLIT mock = Mockito.mock(AnnotationEDSLIT.class);
+
+        // check that we can use the result as intended
+        final AnnotationEDSLITResult fluent = new AnnotationEDSLITResult(mock);
+        fluent.ping().pong().ping().pong().exit();
+
+        Mockito.verify(mock, Mockito.times(2)).ping();
+        Mockito.verify(mock, Mockito.times(2)).pong();
+        Mockito.verify(mock, Mockito.times(1)).exit();
     }
 }

@@ -103,6 +103,7 @@ limitations under the License.
         <compile-testing.version>0.21.0</compile-testing.version>
         <extra-enforcer-rules.version>1.7.0</extra-enforcer-rules.version>
         <javapoet.version>1.13.0</javapoet.version>
+        <mockito.version>5.6.0</mockito.version>
         <testng.version>7.5.1</testng.version>
         <truth.version>1.1.3</truth.version>
     </properties>
@@ -131,6 +132,13 @@ limitations under the License.
             <groupId>com.google.truth</groupId>
             <artifactId>truth</artifactId>
             <version>${truth.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
 

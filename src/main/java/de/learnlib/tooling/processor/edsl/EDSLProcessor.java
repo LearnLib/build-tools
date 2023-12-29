@@ -33,11 +33,13 @@ import java.util.stream.Collectors;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 
@@ -52,7 +54,6 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeSpec.Builder;
 import com.squareup.javapoet.TypeVariableName;
-import de.learnlib.tooling.annotation.builder.GenerateBuilder;
 import de.learnlib.tooling.annotation.edsl.Action;
 import de.learnlib.tooling.annotation.edsl.Expr;
 import de.learnlib.tooling.annotation.edsl.GenerateEDSL;
@@ -80,7 +81,9 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
 
         for (Element e : roundEnv.getElementsAnnotatedWith(GenerateEDSL.class)) {
 
-            final TypeElement elem = super.validateClassKind(e, GenerateBuilder.class);
+            // cast is fine because annotation is only allowed on ElementType.TYPE
+            final TypeElement elem = (TypeElement) e;
+            final boolean isClass = elem.getKind() == ElementKind.CLASS;
             final GenerateEDSL annotation = elem.getAnnotation(GenerateEDSL.class);
 
             final String name = annotation.name();
@@ -95,8 +98,6 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
             final Map<State, TypeSpec.Builder> state2Builder = new LinkedHashMap<>(); // ensure deterministic output
             final Map<State, MethodSpec> state2getter = new HashMap<>();
 
-            final List<ExecutableElement> constructors = getAnnotatedConstructors(elem);
-
             // generate base structure
             final ClassName targetName = ClassName.get(pkg, name);
             final TypeSpec.Builder targetBuilder = createBuilder(elem, annotation, targetName);
@@ -105,16 +106,25 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
                     FieldSpec.builder(sourceType, "delegate", Modifier.PRIVATE, Modifier.FINAL).build();
             targetBuilder.addField(delegate);
 
-            for (ExecutableElement c : constructors) {
-                final MethodSpec.Builder cBuilder = MethodSpec.constructorBuilder().addModifiers(modifiers);
-                final StringJoiner sj = new StringJoiner(", ", "$N = new $T(", ")");
-                for (VariableElement p : c.getParameters()) {
-                    String pName = p.getSimpleName().toString();
-                    cBuilder.addParameter(ParameterizedTypeName.get(p.asType()), pName);
-                    sj.add(pName);
+            if (isClass) {
+                for (ExecutableElement c : ElementFilter.constructorsIn(getAnnotatedElements(elem))) {
+                    final MethodSpec.Builder cBuilder = MethodSpec.constructorBuilder().addModifiers(modifiers);
+                    final StringJoiner sj = new StringJoiner(", ", "$N = new $T(", ")");
+                    for (VariableElement p : c.getParameters()) {
+                        String pName = p.getSimpleName().toString();
+                        cBuilder.addParameter(ParameterizedTypeName.get(p.asType()), pName);
+                        sj.add(pName);
+                    }
+                    cBuilder.addStatement(CodeBlock.of(sj.toString(), delegate, sourceType));
+                    targetBuilder.addMethod(cBuilder.build());
                 }
-                cBuilder.addStatement(CodeBlock.of(sj.toString(), delegate, sourceType));
-                targetBuilder.addMethod(cBuilder.build());
+            } else {
+                final String orig = "orig";
+                targetBuilder.addMethod(MethodSpec.constructorBuilder()
+                                                  .addModifiers(modifiers)
+                                                  .addParameter(sourceType, orig)
+                                                  .addStatement("$N = $N", delegate, orig)
+                                                  .build());
             }
 
             // generate state classes
@@ -200,9 +210,12 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
                             final Action ann = m.getAnnotation(Action.class);
                             if (ann != null && ann.isTerminating()) {
                                 if (succ.isAccept()) {
-                                    final CodeBlock statement =
-                                            CodeBlock.builder().add(CodeBlock.of("return ")).add(callDelegate).build();
-                                    methodBuilder.addStatement(statement)
+                                    final CodeBlock.Builder sBuilder = CodeBlock.builder();
+                                    if (m.getReturnType().getKind() != TypeKind.VOID) {
+                                        sBuilder.add(CodeBlock.of("return "));
+                                    }
+                                    sBuilder.add(callDelegate);
+                                    methodBuilder.addStatement(sBuilder.build())
                                                  .returns(ParameterizedTypeName.get(m.getReturnType()));
                                     builder.addMethod(methodBuilder.build());
                                 }
@@ -306,16 +319,6 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
                                   .stream()
                                   .filter(e -> e.getAnnotation(Action.class) != null)
                                   .collect(Collectors.toList());
-    }
-
-    private List<ExecutableElement> getAnnotatedConstructors(TypeElement clazz) {
-        final List<ExecutableElement> constructors = ElementFilter.constructorsIn(getAnnotatedElements(clazz));
-
-        if (constructors.isEmpty()) {
-            throw new IllegalArgumentException("Could not find annotated constructor while processing " + clazz);
-        }
-
-        return constructors;
     }
 
     private TypeSpec.Builder createBuilder(Element element, GenerateEDSL generateEDSL, ClassName name) {
