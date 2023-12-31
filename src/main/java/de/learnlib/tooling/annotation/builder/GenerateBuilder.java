@@ -84,13 +84,6 @@ public @interface GenerateBuilder {
     boolean builderPublic() default true;
 
     /**
-     * Returns whether the generated builder should be a <code>final</code> class.
-     *
-     * @return whether the generated builder should be final
-     */
-    boolean builderFinal() default true;
-
-    /**
      * The name for the create method.
      *
      * @return the name for the create method

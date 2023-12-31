@@ -262,11 +262,9 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
             builder.addTypeVariable(typeName);
         }
 
+        builder.addModifiers(Modifier.FINAL);
         if (annotation.builderPublic()) {
             builder.addModifiers(Modifier.PUBLIC);
-        }
-        if (annotation.builderFinal()) {
-            builder.addModifiers(Modifier.FINAL);
         }
 
         return builder;
