@@ -57,12 +57,18 @@ public @interface GenerateEDSL {
     String syntax();
 
     /**
-     * Returns whether the generated (embedded) DSL class should be declared as {@code public}. If set to {@code false},
-     * it will have package-private visibility.
+     * A flag indicating whether the generated class should be {@code public}.
      *
-     * @return whether the generated (embedded) DSL class should be declared as {@code public}
+     * @return whether the generated class should be {@code public}
      */
-    boolean isPublic() default true;
+    boolean classPublic() default true;
+
+    /**
+     * A flag indicating whether the constructor of the generated class should be {@code public}.
+     *
+     * @return whether the constructor(s) of the generated class should be {@code public}
+     */
+    boolean constructorPublic() default true;
 
     /**
      * Returns the named expressions that can be used in the embedded DSL syntax definition. Expressions are substituted

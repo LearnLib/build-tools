@@ -74,6 +74,20 @@ public @interface GenerateRefinement {
     Interface[] interfaces() default {};
 
     /**
+     * A flag indicating whether the generated class should be {@code public}.
+     *
+     * @return whether the generated class should be {@code public}
+     */
+    boolean classPublic() default true;
+
+    /**
+     * A flag indicating whether the constructor of the generated class should be {@code public}.
+     *
+     * @return whether the constructor(s) of the generated class should be {@code public}
+     */
+    boolean constructorPublic() default true;
+
+    /**
      * The string which should be copied to the generated class' JavaDoc as-is.
      *
      * @return the string which should be copied to the generated class' JavaDoc as-is

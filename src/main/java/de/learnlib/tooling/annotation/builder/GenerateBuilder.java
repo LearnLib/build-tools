@@ -77,11 +77,18 @@ public @interface GenerateBuilder {
     Class<?> defaults() default Void.class;
 
     /**
-     * Returns whether the generated builder should be a <code>public</code> class.
+     * A flag indicating whether the generated class should be {@code public}.
      *
-     * @return whether the generated builder should be public
+     * @return whether the generated class should be {@code public}
      */
-    boolean builderPublic() default true;
+    boolean classPublic() default true;
+
+    /**
+     * A flag indicating whether the constructor of the generated class should be {@code public}.
+     *
+     * @return whether the constructor(s) of the generated class should be {@code public}
+     */
+    boolean constructorPublic() default true;
 
     /**
      * The name for the create method.

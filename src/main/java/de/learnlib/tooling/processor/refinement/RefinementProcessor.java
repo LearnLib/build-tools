@@ -121,12 +121,15 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
 
     private TypeSpec.Builder createClass(TypeElement annotatedClass, GenerateRefinement annotation) {
         final TypeSpec.Builder builder = TypeSpec.classBuilder(annotation.name())
-                                                 .addModifiers(Modifier.PUBLIC)
                                                  .addAnnotation(super.createGeneratedAnnotation(annotatedClass));
 
         final String classDoc = annotation.classDoc();
         if (classDoc != null && !classDoc.isEmpty()) {
             builder.addJavadoc(classDoc);
+        }
+
+        if (annotation.classPublic()) {
+            builder.addModifiers(Modifier.PUBLIC);
         }
 
         for (String typeParameter : annotation.generics()) {
@@ -183,7 +186,7 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
         constructor:
         for (ExecutableElement constructor : ElementFilter.constructorsIn(annotatedClass.getEnclosedElements())) {
 
-            final MethodSpec.Builder mBuilder = MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC);
+            final MethodSpec.Builder mBuilder = MethodSpec.constructorBuilder();
             final StringJoiner superJoiner = new StringJoiner(", ", "super(", ")");
 
             for (VariableElement p : constructor.getParameters()) {
@@ -205,6 +208,10 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
 
             if (constructor.isVarArgs() && super.requiresSafeVarargs(mBuilder)) {
                 mBuilder.addAnnotation(SafeVarargs.class);
+            }
+
+            if (annotation.constructorPublic()) {
+                mBuilder.addModifiers(Modifier.PUBLIC);
             }
 
             if (annotation.copyConstructorDoc()) {

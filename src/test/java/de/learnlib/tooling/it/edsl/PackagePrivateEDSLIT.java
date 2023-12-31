@@ -20,7 +20,8 @@ import de.learnlib.tooling.annotation.edsl.GenerateEDSL;
 @GenerateEDSL(packageName = "de.learnlib.tooling.processor.edsl",
               name = "PackagePrivateEDSLITResult",
               syntax = "done",
-              isPublic = false)
+              classPublic = false,
+              constructorPublic = false)
 public class PackagePrivateEDSLIT {
 
     @Action(isTerminating = true)

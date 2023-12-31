@@ -63,8 +63,10 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
             final String name = getBuilderName(constructor, annotation);
             final String pkg = super.getPackageName(constructor, annotation.packageName());
             final String create = annotation.createName();
-            final Iterable<Modifier> modifiers =
-                    annotation.builderPublic() ? Collections.singleton(Modifier.PUBLIC) : Collections.emptyList();
+            final Iterable<Modifier> classModifiers =
+                    annotation.classPublic() ? Collections.singleton(Modifier.PUBLIC) : Collections.emptyList();
+            final Iterable<Modifier> constructorModifiers =
+                    annotation.constructorPublic() ? Collections.singleton(Modifier.PUBLIC) : Collections.emptyList();
             final TypeElement defaultsClass = getDefaultsValue(annotation);
             final Set<String> defaultsValues = ElementFilter.methodsIn(defaultsClass.getEnclosedElements())
                                                             .stream()
@@ -83,9 +85,10 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
             final TypeName targetType = ClassName.get(clazz.asType());
 
             final TypeSpec.Builder classBuilder = createBuilder(clazz, annotation, builderName);
-            final MethodSpec.Builder constructorBuilder = MethodSpec.constructorBuilder().addModifiers(modifiers);
+            final MethodSpec.Builder constructorBuilder =
+                    MethodSpec.constructorBuilder().addModifiers(constructorModifiers);
             final MethodSpec.Builder createBuilder = MethodSpec.methodBuilder(create)
-                                                               .addModifiers(modifiers)
+                                                               .addModifiers(classModifiers)
                                                                .returns(targetType)
                                                                .addExceptions(constructor.getThrownTypes()
                                                                                          .stream()
@@ -143,7 +146,7 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
                         final String getterName = value.isEmpty() ? capitalize(fieldName) : value;
                         final MethodSpec.Builder getterBuilder =
                                 MethodSpec.methodBuilder(annotation.getterPrefix() + getterName)
-                                          .addModifiers(modifiers)
+                                          .addModifiers(classModifiers)
                                           .returns(fieldTypeName)
                                           .addStatement("return this.$N", fieldName);
                         classBuilder.addMethod(getterBuilder.build());
@@ -157,7 +160,7 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
                         final String setterName = value.isEmpty() ? capitalize(fieldName) : value;
                         final MethodSpec.Builder setterBuilder =
                                 MethodSpec.methodBuilder(annotation.setterPrefix() + setterName)
-                                          .addModifiers(modifiers)
+                                          .addModifiers(classModifiers)
                                           .varargs(isVarArgs)
                                           .addParameter(fieldTypeName, fieldName)
                                           .addStatement("this.$N = $N", fieldName, fieldName);
@@ -175,7 +178,7 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
                         final String withName = value.isEmpty() ? capitalize(fieldName) : value;
                         final MethodSpec.Builder withBuilder =
                                 MethodSpec.methodBuilder(annotation.withPrefix() + withName)
-                                          .addModifiers(modifiers)
+                                          .addModifiers(classModifiers)
                                           .varargs(isVarArgs)
                                           .returns(builderType)
                                           .addParameter(fieldTypeName, fieldName)
@@ -263,7 +266,7 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
         }
 
         builder.addModifiers(Modifier.FINAL);
-        if (annotation.builderPublic()) {
+        if (annotation.classPublic()) {
             builder.addModifiers(Modifier.PUBLIC);
         }
 

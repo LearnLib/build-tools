@@ -16,5 +16,8 @@ package de.learnlib.tooling.it.refinement;
 
 import de.learnlib.tooling.annotation.refinement.GenerateRefinement;
 
-@GenerateRefinement(name = "PackagePrivateRefinementITResult", packageName = "de.learnlib.tooling.processor.refinement")
+@GenerateRefinement(name = "PackagePrivateRefinementITResult",
+                    packageName = "de.learnlib.tooling.processor.refinement",
+                    classPublic = false,
+                    constructorPublic = false)
 public class PackagePrivateRefinementIT {}

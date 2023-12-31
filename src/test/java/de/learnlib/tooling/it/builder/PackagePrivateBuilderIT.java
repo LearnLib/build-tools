@@ -18,7 +18,9 @@ import de.learnlib.tooling.annotation.builder.GenerateBuilder;
 
 public class PackagePrivateBuilderIT {
 
-    @GenerateBuilder(packageName = "de.learnlib.tooling.processor.builder", builderPublic = false)
+    @GenerateBuilder(packageName = "de.learnlib.tooling.processor.builder",
+                     classPublic = false,
+                     constructorPublic = false)
     public PackagePrivateBuilderIT(String a) {}
 
 }

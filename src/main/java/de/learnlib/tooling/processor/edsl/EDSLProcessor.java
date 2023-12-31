@@ -94,7 +94,10 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
 
             final String name = annotation.name();
             final String pkg = super.getPackageName(elem, annotation.packageName());
-            final Modifier[] modifiers = annotation.isPublic() ? new Modifier[] {Modifier.PUBLIC} : new Modifier[0];
+            final Modifier[] classModifiers =
+                    annotation.classPublic() ? new Modifier[] {Modifier.PUBLIC} : new Modifier[0];
+            final Modifier[] constructorModifiers =
+                    annotation.constructorPublic() ? new Modifier[] {Modifier.PUBLIC} : new Modifier[0];
 
             final List<String> tokens = getTokens(syntax);
             final Map<String, Character> token2Label = new HashMap<>();
@@ -122,7 +125,8 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
 
             if (isClass && !constructors.isEmpty()) {
                 for (ExecutableElement c : constructors) {
-                    final MethodSpec.Builder cBuilder = MethodSpec.constructorBuilder().addModifiers(modifiers);
+                    final MethodSpec.Builder cBuilder =
+                            MethodSpec.constructorBuilder().addModifiers(constructorModifiers);
                     final StringJoiner sj = new StringJoiner(", ", "$N = new $T(", ")");
                     for (VariableElement p : c.getParameters()) {
                         String pName = p.getSimpleName().toString();
@@ -135,7 +139,7 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
             } else {
                 final String orig = "orig";
                 targetBuilder.addMethod(MethodSpec.constructorBuilder()
-                                                  .addModifiers(modifiers)
+                                                  .addModifiers(constructorModifiers)
                                                   .addParameter(sourceType, orig)
                                                   .addStatement("$N = $N", delegate, orig)
                                                   .build());
@@ -160,7 +164,7 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
                     cName = targetName.nestedClass(name + id++);
                     cType = cName;
                     cBuilder = TypeSpec.classBuilder(cName)
-                                       .addModifiers(modifiers)
+                                       .addModifiers(classModifiers)
                                        .addModifiers(Modifier.FINAL)
                                        .addMethod(MethodSpec.constructorBuilder()
                                                             .addModifiers(Modifier.PRIVATE)
@@ -201,7 +205,7 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
                         final MethodSpec getter = state2getter.get(succ);
                         for (ExecutableElement m : token2Method.getOrDefault(token, Collections.emptyList())) {
                             final MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(token)
-                                                                               .addModifiers(modifiers)
+                                                                               .addModifiers(classModifiers)
                                                                                .varargs(m.isVarArgs())
                                                                                .addExceptions(m.getThrownTypes()
                                                                                                .stream()
@@ -400,7 +404,7 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
             builder.addTypeVariable(typeName);
         }
 
-        if (annotation.isPublic()) {
+        if (annotation.classPublic()) {
             builder.addModifiers(Modifier.PUBLIC);
         }
 
