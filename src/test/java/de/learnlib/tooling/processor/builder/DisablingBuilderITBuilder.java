@@ -6,9 +6,6 @@ import de.learnlib.tooling.it.refinement.SuperInterface;
 import java.lang.Object;
 import java.lang.String;
 
-/**
- * This is an auto-generated builder for {@link DisablingBuilderIT}.
- */
 @Generated(
         generator = "de.learnlib.tooling.processor.builder.BuilderProcessor",
         source = "de.learnlib.tooling.it.builder.DisablingBuilderIT"

@@ -20,6 +20,8 @@ import com.google.testing.compile.Compilation;
 import com.google.testing.compile.CompilationSubject;
 import com.google.testing.compile.Compiler;
 import de.learnlib.tooling.Util;
+import de.learnlib.tooling.it.refinement.DocRefinementIT;
+import de.learnlib.tooling.it.refinement.DocRefinementITResult;
 import de.learnlib.tooling.it.refinement.Error2RefinementIT;
 import de.learnlib.tooling.it.refinement.ErrorRefinementIT;
 import de.learnlib.tooling.it.refinement.GenericRefinementIT;
@@ -36,6 +38,19 @@ import de.learnlib.tooling.it.refinement.WarningRefinementITResult;
 import org.testng.annotations.Test;
 
 public class RefinementProcessorTest {
+
+    @Test
+    public void testDocRefinement() throws IOException {
+        final Compilation compilation = Compiler.javac()
+                                                .withProcessors(new RefinementProcessor())
+                                                .compile(Util.toJFO(DocRefinementIT.class));
+
+        final CompilationSubject subject = CompilationSubject.assertThat(compilation);
+        subject.succeededWithoutWarnings();
+        subject.generatedSourceFile(Util.toFQN(DocRefinementITResult.class))
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(DocRefinementITResult.class).getCharContent(false));
+    }
 
     @Test
     public void testSimpleRefinement() throws IOException {
@@ -121,8 +136,9 @@ public class RefinementProcessorTest {
 
     @Test
     public void testError2Refinement() {
-        final Compilation compilation =
-                Compiler.javac().withProcessors(new RefinementProcessor()).compile(Util.toJFO(Error2RefinementIT.class));
+        final Compilation compilation = Compiler.javac()
+                                                .withProcessors(new RefinementProcessor())
+                                                .compile(Util.toJFO(Error2RefinementIT.class));
 
         final CompilationSubject subject = CompilationSubject.assertThat(compilation);
         subject.failed();

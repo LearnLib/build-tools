@@ -25,6 +25,8 @@ import de.learnlib.tooling.it.edsl.AnnotationEDSLIT;
 import de.learnlib.tooling.it.edsl.AnnotationEDSLITResult;
 import de.learnlib.tooling.it.edsl.DefaultEDSLIT;
 import de.learnlib.tooling.it.edsl.DefaultEDSLITResult;
+import de.learnlib.tooling.it.edsl.DocEDSLIT;
+import de.learnlib.tooling.it.edsl.DocEDSLITResult;
 import de.learnlib.tooling.it.edsl.EmptyEDSLIT;
 import de.learnlib.tooling.it.edsl.EnumEDSLIT;
 import de.learnlib.tooling.it.edsl.EnumEDSLITResult;
@@ -59,6 +61,18 @@ public class EDSLProcessorTest {
         final String arg = "string";
         DefaultEDSLITResult<Integer, Void, Void, String> fluent = new DefaultEDSLITResult<>(arg);
         Assert.assertEquals(fluent.withInitial("asd").from("s1").on(2, 3).loop().on(4).create(), arg);
+    }
+
+    @Test
+    public void testDocEDSL() throws Exception {
+        final Compilation compilation =
+                Compiler.javac().withProcessors(new EDSLProcessor()).compile(Util.toJFO(DocEDSLIT.class));
+
+        final CompilationSubject subject = CompilationSubject.assertThat(compilation);
+        subject.succeededWithoutWarnings();
+        subject.generatedSourceFile(Util.toFQN(DocEDSLITResult.class))
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(DocEDSLITResult.class).getCharContent(false));
     }
 
     @Test

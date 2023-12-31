@@ -2,9 +2,6 @@ package de.learnlib.tooling.it.edsl;
 
 import de.learnlib.tooling.annotation.Generated;
 
-/**
- * This is an auto-generated embedded domain-specific language for {@link EnumEDSLIT}.
- */
 @Generated(
         generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
         source = "de.learnlib.tooling.it.edsl.EnumEDSLIT"

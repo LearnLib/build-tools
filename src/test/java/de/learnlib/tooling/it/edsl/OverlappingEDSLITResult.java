@@ -3,9 +3,6 @@ package de.learnlib.tooling.it.edsl;
 import de.learnlib.tooling.annotation.Generated;
 import java.lang.String;
 
-/**
- * This is an auto-generated embedded domain-specific language for {@link OverlappingEDSLIT}.
- */
 @Generated(
         generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
         source = "de.learnlib.tooling.it.edsl.OverlappingEDSLIT"

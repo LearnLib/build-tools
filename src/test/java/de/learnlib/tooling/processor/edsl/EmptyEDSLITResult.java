@@ -4,9 +4,6 @@ import de.learnlib.tooling.annotation.Generated;
 import de.learnlib.tooling.it.edsl.EmptyEDSLIT;
 import java.lang.String;
 
-/**
- * This is an auto-generated embedded domain-specific language for {@link EmptyEDSLIT}.
- */
 @Generated(
         generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
         source = "de.learnlib.tooling.it.edsl.EmptyEDSLIT"

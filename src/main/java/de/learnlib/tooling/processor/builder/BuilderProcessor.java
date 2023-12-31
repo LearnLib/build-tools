@@ -246,12 +246,14 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
         return (TypeElement) dt.asElement();
     }
 
-    private TypeSpec.Builder createBuilder(Element element, GenerateBuilder generateBuilder, ClassName name) {
-        final TypeSpec.Builder builder = TypeSpec.classBuilder(name)
-                                                 .addJavadoc("This is an auto-generated builder for {@link $T}.\n",
-                                                             super.processingEnv.getTypeUtils()
-                                                                                .erasure(element.asType()))
-                                                 .addAnnotation(super.createGeneratedAnnotation(element));
+    private TypeSpec.Builder createBuilder(Element element, GenerateBuilder annotation, ClassName name) {
+        final TypeSpec.Builder builder =
+                TypeSpec.classBuilder(name).addAnnotation(super.createGeneratedAnnotation(element));
+
+        final String classDoc = annotation.classDoc();
+        if (classDoc != null && !classDoc.isEmpty()) {
+            builder.addJavadoc(classDoc);
+        }
 
         final DeclaredType clazz = (DeclaredType) element.asType();
 
@@ -260,10 +262,10 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
             builder.addTypeVariable(typeName);
         }
 
-        if (generateBuilder.builderPublic()) {
+        if (annotation.builderPublic()) {
             builder.addModifiers(Modifier.PUBLIC);
         }
-        if (generateBuilder.builderFinal()) {
+        if (annotation.builderFinal()) {
             builder.addModifiers(Modifier.FINAL);
         }
 

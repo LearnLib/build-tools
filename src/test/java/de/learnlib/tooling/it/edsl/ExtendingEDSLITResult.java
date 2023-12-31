@@ -6,9 +6,6 @@ import java.lang.Exception;
 import java.lang.Object;
 import java.lang.SafeVarargs;
 
-/**
- * This is an auto-generated embedded domain-specific language for {@link ExtendingEDSLIT}.
- */
 @Generated(
         generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
         source = "de.learnlib.tooling.it.edsl.ExtendingEDSLIT"

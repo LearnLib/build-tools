@@ -4,14 +4,11 @@ import de.learnlib.tooling.annotation.Generated;
 import de.learnlib.tooling.it.refinement.SuperInterface;
 import java.lang.String;
 
-/**
- * This is an auto-generated builder for {@link SimpleBuilderIT}.
- */
 @Generated(
         generator = "de.learnlib.tooling.processor.builder.BuilderProcessor",
         source = "de.learnlib.tooling.it.builder.SimpleBuilderIT"
 )
-public final class SimpleBuilderITBuilder {
+public final class SimpleBuilderITResult {
     private int a;
 
     private String b;
@@ -20,7 +17,7 @@ public final class SimpleBuilderITBuilder {
 
     private boolean[] d;
 
-    public SimpleBuilderITBuilder() {
+    public SimpleBuilderITResult() {
     }
 
     public int getA() {
@@ -31,7 +28,7 @@ public final class SimpleBuilderITBuilder {
         this.a = a;
     }
 
-    public SimpleBuilderITBuilder withA(int a) {
+    public SimpleBuilderITResult withA(int a) {
         this.a = a;
         return this;
     }
@@ -44,7 +41,7 @@ public final class SimpleBuilderITBuilder {
         this.b = b;
     }
 
-    public SimpleBuilderITBuilder withB(String b) {
+    public SimpleBuilderITResult withB(String b) {
         this.b = b;
         return this;
     }
@@ -57,7 +54,7 @@ public final class SimpleBuilderITBuilder {
         this.c = c;
     }
 
-    public SimpleBuilderITBuilder withC(SuperInterface<?> c) {
+    public SimpleBuilderITResult withC(SuperInterface<?> c) {
         this.c = c;
         return this;
     }
@@ -70,7 +67,7 @@ public final class SimpleBuilderITBuilder {
         this.d = d;
     }
 
-    public SimpleBuilderITBuilder withD(boolean... d) {
+    public SimpleBuilderITResult withD(boolean... d) {
         this.d = d;
         return this;
     }

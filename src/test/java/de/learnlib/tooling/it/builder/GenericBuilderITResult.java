@@ -6,9 +6,6 @@ import de.learnlib.tooling.it.refinement.SuperInterface;
 import java.lang.Exception;
 import java.lang.SafeVarargs;
 
-/**
- * This is an auto-generated builder for {@link GenericBuilderIT}.
- */
 @Generated(
         generator = "de.learnlib.tooling.processor.builder.BuilderProcessor",
         source = "de.learnlib.tooling.it.builder.GenericBuilderIT"

@@ -65,4 +65,19 @@ public @interface GenerateRefinement {
      */
     Interface[] interfaces() default {};
 
+    /**
+     * The string which should be copied to the generated class' JavaDoc as-is.
+     *
+     * @return the string which should be copied to the generated class' JavaDoc as-is
+     */
+    String classDoc() default "";
+
+    /**
+     * A flag indicating whether the JavaDoc of the parent class' constructors should be copied (as-is) to the
+     * refinement's constructors.
+     *
+     * @return {@code true} if the JavaDoc of the constructors should be copied, {@code false} otherwise
+     */
+    boolean copyConstructorDoc() default true;
+
 }

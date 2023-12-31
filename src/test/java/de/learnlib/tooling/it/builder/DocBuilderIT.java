@@ -15,11 +15,11 @@
 package de.learnlib.tooling.it.builder;
 
 import de.learnlib.tooling.annotation.builder.GenerateBuilder;
-import de.learnlib.tooling.it.refinement.SuperInterface;
 
-public class SimpleBuilderIT {
+public class DocBuilderIT {
 
-    @GenerateBuilder(name = "SimpleBuilderITResult")
-    public SimpleBuilderIT(int a, String b, SuperInterface<?> c, boolean... d) {}
+    @GenerateBuilder(name = "DocBuilderITResult",
+                     classDoc = "This is a builder class for constructing {@link DocBuilderIT}s.")
+    public DocBuilderIT() {}
 
 }

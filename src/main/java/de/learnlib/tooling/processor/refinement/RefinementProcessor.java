@@ -15,7 +15,6 @@
 package de.learnlib.tooling.processor.refinement;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,6 +38,7 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.WildcardType;
 import javax.lang.model.util.ElementFilter;
+import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import com.squareup.javapoet.ArrayTypeName;
@@ -60,6 +60,7 @@ import de.learnlib.tooling.processor.AbstractLearnLibProcessor;
 public class RefinementProcessor extends AbstractLearnLibProcessor {
 
     private Types typeUtils;
+    private Elements elementUtils;
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
@@ -70,6 +71,7 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
     public void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
         this.typeUtils = super.processingEnv.getTypeUtils();
+        this.elementUtils = super.processingEnv.getElementUtils();
     }
 
     @Override
@@ -118,9 +120,12 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
     private TypeSpec.Builder createClass(TypeElement annotatedClass, GenerateRefinement annotation) {
         final TypeSpec.Builder builder = TypeSpec.classBuilder(annotation.name())
                                                  .addModifiers(Modifier.PUBLIC)
-                                                 .addJavadoc("This is an auto-generated refinement of {@link $T}.",
-                                                             this.typeUtils.erasure(annotatedClass.asType()))
                                                  .addAnnotation(super.createGeneratedAnnotation(annotatedClass));
+
+        final String classDoc = annotation.classDoc();
+        if (classDoc != null && !classDoc.isEmpty()) {
+            builder.addJavadoc(classDoc);
+        }
 
         for (String typeParameter : annotation.generics()) {
             builder.addTypeVariable(TypeVariableName.get(typeParameter));
@@ -176,15 +181,8 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
         constructor:
         for (ExecutableElement constructor : ElementFilter.constructorsIn(annotatedClass.getEnclosedElements())) {
 
-            final TypeName classType = ClassName.get(this.typeUtils.erasure(annotatedClass.asType()));
             final MethodSpec.Builder mBuilder = MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC);
             final StringJoiner superJoiner = new StringJoiner(", ", "super(", ")");
-            final StringJoiner docJoiner =
-                    new StringJoiner(", ", "This is an auto-generated constructor calling {@link $T#$T(", ")}.");
-
-            final List<TypeName> arguments = new ArrayList<>(constructor.getParameters().size() + 2);
-            arguments.add(classType);
-            arguments.add(classType);
 
             for (VariableElement p : constructor.getParameters()) {
                 final String name = p.getSimpleName().toString();
@@ -198,17 +196,22 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
 
                 mBuilder.addParameter(typeName, name);
                 superJoiner.add(name);
-                docJoiner.add("$T");
-                arguments.add(ClassName.get(this.typeUtils.erasure(p.asType())));
             }
 
+            mBuilder.addStatement(superJoiner.toString());
             mBuilder.varargs(constructor.isVarArgs());
+
             if (constructor.isVarArgs() && super.requiresSafeVarargs(mBuilder)) {
                 mBuilder.addAnnotation(SafeVarargs.class);
             }
 
-            mBuilder.addJavadoc(docJoiner.toString(), arguments.toArray());
-            mBuilder.addStatement(superJoiner.toString());
+            if (annotation.copyConstructorDoc()) {
+                final String doc = this.elementUtils.getDocComment(constructor);
+                if (doc != null) {
+                    mBuilder.addJavadoc(doc);
+                }
+            }
+
             builder.addMethod(mBuilder.build());
         }
 

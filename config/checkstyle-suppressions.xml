@@ -18,6 +18,6 @@ limitations under the License.
         "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
 
 <suppressions>
-    <suppress checks=".*" files=".*it.*Result.*\.java|(Disabling|Simple)BuilderITBuilder.java|EmptyEDSLITResult.java"/>
+    <suppress checks=".*" files=".*it.*Result.*\.java|(Disabling|Empty)BuilderITBuilder.java|EmptyEDSLITResult.java"/>
     <suppress checks="MagicNumber" files="src/test/*"/>
 </suppressions>

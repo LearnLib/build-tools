@@ -384,12 +384,14 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
                                   .collect(Collectors.toList());
     }
 
-    private TypeSpec.Builder createBuilder(Element element, GenerateEDSL generateEDSL, ClassName name) {
-        final TypeSpec.Builder builder = TypeSpec.classBuilder(name)
-                                                 .addJavadoc(
-                                                         "This is an auto-generated embedded domain-specific language for {@link $T}.\n",
-                                                         super.processingEnv.getTypeUtils().erasure(element.asType()))
-                                                 .addAnnotation(super.createGeneratedAnnotation(element));
+    private TypeSpec.Builder createBuilder(Element element, GenerateEDSL annotation, ClassName name) {
+        final TypeSpec.Builder builder =
+                TypeSpec.classBuilder(name).addAnnotation(super.createGeneratedAnnotation(element));
+
+        final String classDoc = annotation.classDoc();
+        if (classDoc != null && !classDoc.isEmpty()) {
+            builder.addJavadoc(classDoc);
+        }
 
         final DeclaredType clazz = (DeclaredType) element.asType();
 
@@ -398,7 +400,7 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
             builder.addTypeVariable(typeName);
         }
 
-        if (generateEDSL.isPublic()) {
+        if (annotation.isPublic()) {
             builder.addModifiers(Modifier.PUBLIC);
         }
 
