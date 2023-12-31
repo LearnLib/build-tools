@@ -17,8 +17,11 @@ package de.learnlib.tooling.it.edsl;
 import de.learnlib.tooling.annotation.edsl.Action;
 import de.learnlib.tooling.annotation.edsl.GenerateEDSL;
 
-@GenerateEDSL(name = "EmptyEDSLITResult", syntax = "done")
-public class EmptyEDSLIT {
+@GenerateEDSL(packageName = "de.learnlib.tooling.processor.edsl",
+              name = "PackagePrivateEDSLITResult",
+              syntax = "done",
+              isPublic = false)
+public class PackagePrivateEDSLIT {
 
     @Action(isTerminating = true)
     public String done() {

@@ -1,7 +1,6 @@
-package de.learnlib.tooling.processor.builder;
+package de.learnlib.tooling.it.builder;
 
 import de.learnlib.tooling.annotation.Generated;
-import de.learnlib.tooling.it.builder.DisablingBuilderIT;
 import de.learnlib.tooling.it.refinement.SuperInterface;
 import java.lang.Object;
 import java.lang.String;
@@ -10,7 +9,7 @@ import java.lang.String;
         generator = "de.learnlib.tooling.processor.builder.BuilderProcessor",
         source = "de.learnlib.tooling.it.builder.DisablingBuilderIT"
 )
-final class DisablingBuilderITBuilder {
+public final class DisablingBuilderITResult {
     private int a;
 
     private String b;
@@ -19,25 +18,25 @@ final class DisablingBuilderITBuilder {
 
     private Object[] d;
 
-    DisablingBuilderITBuilder(int a) {
+    public DisablingBuilderITResult(int a) {
         this.a = a;
         this.b = de.learnlib.tooling.it.builder.DisablingBuilderIT.Defaults.b();
     }
 
-    String getB() {
+    public String getB() {
         return this.b;
     }
 
-    SuperInterface<?> getC() {
+    public SuperInterface<?> getC() {
         return this.c;
     }
 
-    DisablingBuilderITBuilder withC(SuperInterface<?> c) {
+    public DisablingBuilderITResult withC(SuperInterface<?> c) {
         this.c = c;
         return this;
     }
 
-    DisablingBuilderIT create(Object... d) {
+    public DisablingBuilderIT create(Object... d) {
         return new DisablingBuilderIT(a, b, c, d);
     }
 }

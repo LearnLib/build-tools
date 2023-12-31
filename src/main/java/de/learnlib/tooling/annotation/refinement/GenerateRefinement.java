@@ -38,6 +38,14 @@ public @interface GenerateRefinement {
     String name();
 
     /**
+     * The package name of the generated refinement. If left empty, it will be automatically constructed from the
+     * package name of the annotated class.
+     *
+     * @return the package of the generated builder
+     */
+    String packageName() default "";
+
+    /**
      * The type variables the refinement should have.
      *
      * @return the type variables the refinement should have

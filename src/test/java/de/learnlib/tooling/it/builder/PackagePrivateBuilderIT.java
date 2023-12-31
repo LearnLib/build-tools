@@ -12,16 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.learnlib.tooling.it.edsl;
+package de.learnlib.tooling.it.builder;
 
-import de.learnlib.tooling.annotation.edsl.Action;
-import de.learnlib.tooling.annotation.edsl.GenerateEDSL;
+import de.learnlib.tooling.annotation.builder.GenerateBuilder;
 
-@GenerateEDSL(name = "EmptyEDSLITResult", syntax = "done")
-public class EmptyEDSLIT {
+public class PackagePrivateBuilderIT {
 
-    @Action(isTerminating = true)
-    public String done() {
-        return "done";
-    }
+    @GenerateBuilder(packageName = "de.learnlib.tooling.processor.builder", builderPublic = false)
+    public PackagePrivateBuilderIT(String a) {}
+
 }

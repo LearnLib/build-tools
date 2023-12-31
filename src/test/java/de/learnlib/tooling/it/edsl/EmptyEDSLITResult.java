@@ -1,17 +1,16 @@
-package de.learnlib.tooling.processor.edsl;
+package de.learnlib.tooling.it.edsl;
 
 import de.learnlib.tooling.annotation.Generated;
-import de.learnlib.tooling.it.edsl.EmptyEDSLIT;
 import java.lang.String;
 
 @Generated(
         generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
         source = "de.learnlib.tooling.it.edsl.EmptyEDSLIT"
 )
-class EmptyEDSLITResult {
+public class EmptyEDSLITResult {
     private final EmptyEDSLIT delegate;
 
-    EmptyEDSLITResult(EmptyEDSLIT orig) {
+    public EmptyEDSLITResult(EmptyEDSLIT orig) {
         delegate = orig;
     }
 
@@ -19,7 +18,7 @@ class EmptyEDSLITResult {
         return this;
     }
 
-    String done() {
+    public String done() {
         return delegate.done();
     }
 }

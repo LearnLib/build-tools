@@ -29,6 +29,7 @@ import de.learnlib.tooling.it.refinement.GenericRefinementITResult;
 import de.learnlib.tooling.it.refinement.MultiRefinementIT;
 import de.learnlib.tooling.it.refinement.MultiRefinementITResult1;
 import de.learnlib.tooling.it.refinement.MultiRefinementITResult2;
+import de.learnlib.tooling.it.refinement.PackagePrivateRefinementIT;
 import de.learnlib.tooling.it.refinement.SimpleRefinementIT;
 import de.learnlib.tooling.it.refinement.SimpleRefinementITResult;
 import de.learnlib.tooling.it.refinement.SingleRefinementIT;
@@ -41,9 +42,8 @@ public class RefinementProcessorTest {
 
     @Test
     public void testDocRefinement() throws IOException {
-        final Compilation compilation = Compiler.javac()
-                                                .withProcessors(new RefinementProcessor())
-                                                .compile(Util.toJFO(DocRefinementIT.class));
+        final Compilation compilation =
+                Compiler.javac().withProcessors(new RefinementProcessor()).compile(Util.toJFO(DocRefinementIT.class));
 
         final CompilationSubject subject = CompilationSubject.assertThat(compilation);
         subject.succeededWithoutWarnings();
@@ -145,5 +145,18 @@ public class RefinementProcessorTest {
         // the non erroneous class should procduce no errors
         subject.hadErrorCount(1);
         subject.hadErrorContaining("number of");
+    }
+
+    @Test
+    public void testPackagePrivateRefinement() throws IOException {
+        final Compilation compilation = Compiler.javac()
+                                                .withProcessors(new RefinementProcessor())
+                                                .compile(Util.toJFO(PackagePrivateRefinementIT.class));
+
+        final CompilationSubject subject = CompilationSubject.assertThat(compilation);
+        subject.succeededWithoutWarnings();
+        subject.generatedSourceFile(Util.toFQN(PackagePrivateRefinementITResult.class))
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(PackagePrivateRefinementITResult.class).getCharContent(false));
     }
 }

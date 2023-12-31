@@ -12,16 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.learnlib.tooling.it.edsl;
+package de.learnlib.tooling.it.refinement;
 
-import de.learnlib.tooling.annotation.edsl.Action;
-import de.learnlib.tooling.annotation.edsl.GenerateEDSL;
+import de.learnlib.tooling.annotation.refinement.GenerateRefinement;
 
-@GenerateEDSL(name = "EmptyEDSLITResult", syntax = "done")
-public class EmptyEDSLIT {
-
-    @Action(isTerminating = true)
-    public String done() {
-        return "done";
-    }
-}
+@GenerateRefinement(name = "PackagePrivateRefinementITResult", packageName = "de.learnlib.tooling.processor.refinement")
+public class PackagePrivateRefinementIT {}

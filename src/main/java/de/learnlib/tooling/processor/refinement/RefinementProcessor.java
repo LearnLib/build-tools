@@ -105,7 +105,9 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
 
                 if (!builder.methodSpecs.isEmpty()) {
                     final JavaFile file =
-                            JavaFile.builder(super.getPackageName(elem, ""), builder.build()).indent("    ").build();
+                            JavaFile.builder(super.getPackageName(elem, annotation.packageName()), builder.build())
+                                    .indent("    ")
+                                    .build();
                     try {
                         file.writeTo(super.processingEnv.getFiler());
                     } catch (IOException e) {

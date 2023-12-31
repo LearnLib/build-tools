@@ -21,12 +21,14 @@ import com.google.testing.compile.CompilationSubject;
 import com.google.testing.compile.Compiler;
 import de.learnlib.tooling.Util;
 import de.learnlib.tooling.it.builder.DisablingBuilderIT;
+import de.learnlib.tooling.it.builder.DisablingBuilderITResult;
 import de.learnlib.tooling.it.builder.DocBuilderIT;
 import de.learnlib.tooling.it.builder.DocBuilderITResult;
 import de.learnlib.tooling.it.builder.EmptyBuilderIT;
 import de.learnlib.tooling.it.builder.EmptyBuilderITBuilder;
 import de.learnlib.tooling.it.builder.GenericBuilderIT;
 import de.learnlib.tooling.it.builder.GenericBuilderITResult;
+import de.learnlib.tooling.it.builder.PackagePrivateBuilderIT;
 import de.learnlib.tooling.it.builder.RenamedBuilderITResult;
 import de.learnlib.tooling.it.builder.RenamingBuilderIT;
 import de.learnlib.tooling.it.builder.SimpleBuilderIT;
@@ -90,9 +92,9 @@ public class BuilderProcessorTest {
 
         final CompilationSubject subject = CompilationSubject.assertThat(compilation);
         subject.succeededWithoutWarnings();
-        subject.generatedSourceFile(Util.toFQN(DisablingBuilderITBuilder.class))
+        subject.generatedSourceFile(Util.toFQN(DisablingBuilderITResult.class))
                .contentsAsUtf8String()
-               .isEqualTo(Util.toJFO(DisablingBuilderITBuilder.class).getCharContent(false));
+               .isEqualTo(Util.toJFO(DisablingBuilderITResult.class).getCharContent(false));
     }
 
     @Test
@@ -105,5 +107,18 @@ public class BuilderProcessorTest {
         subject.generatedSourceFile(Util.toFQN(GenericBuilderITResult.class))
                .contentsAsUtf8String()
                .isEqualTo(Util.toJFO(GenericBuilderITResult.class).getCharContent(false));
+    }
+
+    @Test
+    public void testPackagePrivateBuilder() throws IOException {
+        final Compilation compilation = Compiler.javac()
+                                                .withProcessors(new BuilderProcessor())
+                                                .compile(Util.toJFO(PackagePrivateBuilderIT.class));
+
+        final CompilationSubject subject = CompilationSubject.assertThat(compilation);
+        subject.succeededWithoutWarnings();
+        subject.generatedSourceFile(Util.toFQN(PackagePrivateBuilderITBuilder.class))
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(PackagePrivateBuilderITBuilder.class).getCharContent(false));
     }
 }

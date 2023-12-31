@@ -20,10 +20,9 @@ import de.learnlib.tooling.it.refinement.SuperInterface;
 
 public class DisablingBuilderIT {
 
-    @GenerateBuilder(defaults = Defaults.class,
-                     packageName = "de.learnlib.tooling.processor.builder",
-                     setterPrefix = GenerateBuilder.SUPPRESS,
-                     builderPublic = false)
+    @GenerateBuilder(name = "DisablingBuilderITResult",
+                     defaults = Defaults.class,
+                     setterPrefix = GenerateBuilder.SUPPRESS)
     public DisablingBuilderIT(@Option(name = GenerateBuilder.SUPPRESS, requiredOnInstantiation = true) int a,
                               @Option(withName = GenerateBuilder.SUPPRESS) String b,
                               SuperInterface<?> c,

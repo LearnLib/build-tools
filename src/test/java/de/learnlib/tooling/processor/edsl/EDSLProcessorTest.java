@@ -28,6 +28,7 @@ import de.learnlib.tooling.it.edsl.DefaultEDSLITResult;
 import de.learnlib.tooling.it.edsl.DocEDSLIT;
 import de.learnlib.tooling.it.edsl.DocEDSLITResult;
 import de.learnlib.tooling.it.edsl.EmptyEDSLIT;
+import de.learnlib.tooling.it.edsl.EmptyEDSLITResult;
 import de.learnlib.tooling.it.edsl.EnumEDSLIT;
 import de.learnlib.tooling.it.edsl.EnumEDSLITResult;
 import de.learnlib.tooling.it.edsl.Error2EDSLIT;
@@ -38,6 +39,7 @@ import de.learnlib.tooling.it.edsl.InterfaceEDSLIT;
 import de.learnlib.tooling.it.edsl.InterfaceEDSLITResult;
 import de.learnlib.tooling.it.edsl.OverlappingEDSLIT;
 import de.learnlib.tooling.it.edsl.OverlappingEDSLITResult;
+import de.learnlib.tooling.it.edsl.PackagePrivateEDSLIT;
 import de.learnlib.tooling.it.edsl.TerminatingEDSLIT;
 import de.learnlib.tooling.it.edsl.TerminatingEDSLITResult;
 import org.mockito.Mockito;
@@ -239,5 +241,21 @@ public class EDSLProcessorTest {
         subject.failed();
         subject.hadErrorCount(1);
         subject.hadErrorContaining("syntax contains expressions");
+    }
+
+    @Test
+    public void testPackagePrivateEDSL() throws IOException {
+        final Compilation compilation =
+                Compiler.javac().withProcessors(new EDSLProcessor()).compile(Util.toJFO(PackagePrivateEDSLIT.class));
+
+        final CompilationSubject subject = CompilationSubject.assertThat(compilation);
+        subject.succeededWithoutWarnings();
+        subject.generatedSourceFile(Util.toFQN(PackagePrivateEDSLITResult.class))
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(PackagePrivateEDSLITResult.class).getCharContent(false));
+
+        // check that we can use the result as intended
+        final PackagePrivateEDSLITResult fluent = new PackagePrivateEDSLITResult(new PackagePrivateEDSLIT());
+        Assert.assertEquals(fluent.done(), "done");
     }
 }
