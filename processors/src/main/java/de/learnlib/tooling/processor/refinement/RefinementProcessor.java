@@ -78,11 +78,8 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 
-        final Set<Element> elements = new HashSet<>();
-        elements.addAll(roundEnv.getElementsAnnotatedWith(GenerateRefinements.class));
-        elements.addAll(roundEnv.getElementsAnnotatedWith(GenerateRefinement.class));
-
-        for (Element elem : elements) {
+        for (Element elem : roundEnv.getElementsAnnotatedWithAny(Set.of(GenerateRefinements.class,
+                                                                        GenerateRefinement.class))) {
 
             if (elem.getKind() != ElementKind.CLASS) {
                 super.printWarning("Generating refinements is only supported for classes. Skipping...", elem);
