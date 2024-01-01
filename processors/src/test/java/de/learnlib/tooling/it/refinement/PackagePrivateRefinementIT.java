@@ -20,4 +20,7 @@ import de.learnlib.tooling.annotation.refinement.GenerateRefinement;
                     packageName = "de.learnlib.tooling.processor.refinement",
                     classPublic = false,
                     constructorPublic = false)
-public class PackagePrivateRefinementIT {}
+public class PackagePrivateRefinementIT {
+
+    public PackagePrivateRefinementIT() {}
+}

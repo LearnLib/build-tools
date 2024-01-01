@@ -7,7 +7,4 @@ import de.learnlib.tooling.annotation.Generated;
         source = "de.learnlib.tooling.it.refinement.SimpleRefinementIT"
 )
 public class SimpleRefinementITResult extends SimpleRefinementIT {
-    public SimpleRefinementITResult() {
-        super();
-    }
 }

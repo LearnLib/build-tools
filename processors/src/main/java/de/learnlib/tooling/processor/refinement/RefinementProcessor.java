@@ -39,6 +39,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.WildcardType;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
+import javax.lang.model.util.Elements.Origin;
 import javax.lang.model.util.Types;
 
 import com.squareup.javapoet.ArrayTypeName;
@@ -103,16 +104,14 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
                 addInterfaces(builder, annotation);
                 addConstructors(builder, annotatedClass, annotation, typeVarMap);
 
-                if (!builder.methodSpecs.isEmpty()) {
-                    final JavaFile file =
-                            JavaFile.builder(super.getPackageName(elem, annotation.packageName()), builder.build())
-                                    .indent("    ")
-                                    .build();
-                    try {
-                        file.writeTo(super.processingEnv.getFiler());
-                    } catch (IOException e) {
-                        super.printError("Could not write file: " + e.getMessage(), elem);
-                    }
+                final JavaFile file =
+                        JavaFile.builder(super.getPackageName(elem, annotation.packageName()), builder.build())
+                                .indent("    ")
+                                .build();
+                try {
+                    file.writeTo(super.processingEnv.getFiler());
+                } catch (IOException e) {
+                    super.printError("Could not write file: " + e.getMessage(), elem);
                 }
             }
         }
@@ -182,50 +181,56 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
                                  Map<String, Generic> typeVarMap) {
 
         final Mapping[] typeMapping = annotation.typeMapping();
+        final List<ExecutableElement> constructors = ElementFilter.constructorsIn(annotatedClass.getEnclosedElements());
+        final boolean onlyDefault =
+                constructors.size() == 1 && this.elementUtils.getOrigin(constructors.get(0)) != Origin.EXPLICIT;
 
-        constructor:
-        for (ExecutableElement constructor : ElementFilter.constructorsIn(annotatedClass.getEnclosedElements())) {
+        if (!onlyDefault) {
+            constructor:
+            for (ExecutableElement constructor : constructors) {
 
-            final MethodSpec.Builder mBuilder = MethodSpec.constructorBuilder();
-            final StringJoiner superJoiner = new StringJoiner(", ", "super(", ")");
+                final MethodSpec.Builder mBuilder = MethodSpec.constructorBuilder();
+                final StringJoiner superJoiner = new StringJoiner(", ", "super(", ")");
 
-            for (VariableElement p : constructor.getParameters()) {
-                final String name = p.getSimpleName().toString();
-                final TypeName typeName = mapTypeName(p.asType(), typeMapping, typeVarMap);
+                for (VariableElement p : constructor.getParameters()) {
+                    final String name = p.getSimpleName().toString();
+                    final TypeName typeName = mapTypeName(p.asType(), typeMapping, typeVarMap);
 
-                if (typeName == null) {
-                    super.printWarning("Constructor uses a dynamic type variable which are not supported. Skipping...",
-                                       constructor);
-                    continue constructor;
+                    if (typeName == null) {
+                        super.printWarning(
+                                "Constructor uses a dynamic type variable which are not supported. Skipping...",
+                                constructor);
+                        continue constructor;
+                    }
+
+                    mBuilder.addParameter(typeName, name);
+                    superJoiner.add(name);
                 }
 
-                mBuilder.addParameter(typeName, name);
-                superJoiner.add(name);
-            }
+                mBuilder.addStatement(superJoiner.toString());
+                mBuilder.varargs(constructor.isVarArgs());
 
-            mBuilder.addStatement(superJoiner.toString());
-            mBuilder.varargs(constructor.isVarArgs());
-
-            if (constructor.isVarArgs() && super.requiresSafeVarargs(mBuilder)) {
-                mBuilder.addAnnotation(SafeVarargs.class);
-            }
-
-            if (annotation.constructorPublic()) {
-                mBuilder.addModifiers(Modifier.PUBLIC);
-            }
-
-            if (annotation.copyConstructorDoc()) {
-                final String doc = this.elementUtils.getDocComment(constructor);
-                if (doc != null) {
-                    mBuilder.addJavadoc(doc);
+                if (constructor.isVarArgs() && super.requiresSafeVarargs(mBuilder)) {
+                    mBuilder.addAnnotation(SafeVarargs.class);
                 }
+
+                if (annotation.constructorPublic()) {
+                    mBuilder.addModifiers(Modifier.PUBLIC);
+                }
+
+                if (annotation.copyConstructorDoc()) {
+                    final String doc = this.elementUtils.getDocComment(constructor);
+                    if (doc != null) {
+                        mBuilder.addJavadoc(doc);
+                    }
+                }
+
+                builder.addMethod(mBuilder.build());
             }
 
-            builder.addMethod(mBuilder.build());
-        }
-
-        if (builder.methodSpecs.isEmpty()) {
-            super.printError("No eligible constructors found", annotatedClass);
+            if (builder.methodSpecs.isEmpty()) {
+                super.printError("No eligible constructors found", annotatedClass);
+            }
         }
     }
 
