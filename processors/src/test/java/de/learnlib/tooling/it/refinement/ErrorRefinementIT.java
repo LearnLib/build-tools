@@ -22,6 +22,10 @@ import de.learnlib.tooling.annotation.refinement.Generic;
                                       @Generic(clazz = SubInterface.class, generics = "Boolean")})
 public class ErrorRefinementIT<O, T1 extends SuperInterface<O>> {
     /*
+     * Private constructors should not be copied because they cannot be called in the refinments.
+     */
+    private ErrorRefinementIT() {}
+    /*
      * The refinement processor (currently) cannot handle dynamic type variables.
      */
     public <T2 extends SuperInterface2<O> & SuperInterface<O>> ErrorRefinementIT(T2 a) {}

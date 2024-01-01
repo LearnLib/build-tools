@@ -8,7 +8,7 @@ import de.learnlib.tooling.it.refinement.PackagePrivateRefinementIT;
         source = "de.learnlib.tooling.it.refinement.PackagePrivateRefinementIT"
 )
 class PackagePrivateRefinementITResult extends PackagePrivateRefinementIT {
-    PackagePrivateRefinementITResult() {
-        super();
+    PackagePrivateRefinementITResult(int a) {
+        super(a);
     }
 }

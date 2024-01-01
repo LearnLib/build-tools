@@ -119,8 +119,8 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
     }
 
     private TypeSpec.Builder createClass(TypeElement annotatedClass, GenerateRefinement annotation) {
-        final TypeSpec.Builder builder = TypeSpec.classBuilder(annotation.name())
-                                                 .addAnnotation(super.createGeneratedAnnotation(annotatedClass));
+        final TypeSpec.Builder builder =
+                TypeSpec.classBuilder(annotation.name()).addAnnotation(super.createGeneratedAnnotation(annotatedClass));
 
         final String classDoc = annotation.classDoc();
         if (classDoc != null && !classDoc.isEmpty()) {
@@ -189,43 +189,45 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
             constructor:
             for (ExecutableElement constructor : constructors) {
 
-                final MethodSpec.Builder mBuilder = MethodSpec.constructorBuilder();
-                final StringJoiner superJoiner = new StringJoiner(", ", "super(", ")");
+                if (!constructor.getModifiers().contains(Modifier.PRIVATE)) {
+                    final MethodSpec.Builder mBuilder = MethodSpec.constructorBuilder();
+                    final StringJoiner superJoiner = new StringJoiner(", ", "super(", ")");
 
-                for (VariableElement p : constructor.getParameters()) {
-                    final String name = p.getSimpleName().toString();
-                    final TypeName typeName = mapTypeName(p.asType(), typeMapping, typeVarMap);
+                    for (VariableElement p : constructor.getParameters()) {
+                        final String name = p.getSimpleName().toString();
+                        final TypeName typeName = mapTypeName(p.asType(), typeMapping, typeVarMap);
 
-                    if (typeName == null) {
-                        super.printWarning(
-                                "Constructor uses a dynamic type variable which are not supported. Skipping...",
-                                constructor);
-                        continue constructor;
+                        if (typeName == null) {
+                            super.printWarning(
+                                    "Constructor uses a dynamic type variable which are not supported. Skipping...",
+                                    constructor);
+                            continue constructor;
+                        }
+
+                        mBuilder.addParameter(typeName, name);
+                        superJoiner.add(name);
                     }
 
-                    mBuilder.addParameter(typeName, name);
-                    superJoiner.add(name);
-                }
+                    mBuilder.addStatement(superJoiner.toString());
+                    mBuilder.varargs(constructor.isVarArgs());
 
-                mBuilder.addStatement(superJoiner.toString());
-                mBuilder.varargs(constructor.isVarArgs());
-
-                if (constructor.isVarArgs() && super.requiresSafeVarargs(mBuilder)) {
-                    mBuilder.addAnnotation(SafeVarargs.class);
-                }
-
-                if (annotation.constructorPublic()) {
-                    mBuilder.addModifiers(Modifier.PUBLIC);
-                }
-
-                if (annotation.copyConstructorDoc()) {
-                    final String doc = this.elementUtils.getDocComment(constructor);
-                    if (doc != null) {
-                        mBuilder.addJavadoc(doc);
+                    if (constructor.isVarArgs() && super.requiresSafeVarargs(mBuilder)) {
+                        mBuilder.addAnnotation(SafeVarargs.class);
                     }
-                }
 
-                builder.addMethod(mBuilder.build());
+                    if (annotation.constructorPublic()) {
+                        mBuilder.addModifiers(Modifier.PUBLIC);
+                    }
+
+                    if (annotation.copyConstructorDoc()) {
+                        final String doc = this.elementUtils.getDocComment(constructor);
+                        if (doc != null) {
+                            mBuilder.addJavadoc(doc);
+                        }
+                    }
+
+                    builder.addMethod(mBuilder.build());
+                }
             }
 
             if (builder.methodSpecs.isEmpty()) {

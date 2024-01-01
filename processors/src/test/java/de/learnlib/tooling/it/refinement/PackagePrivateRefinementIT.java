@@ -22,5 +22,7 @@ import de.learnlib.tooling.annotation.refinement.GenerateRefinement;
                     constructorPublic = false)
 public class PackagePrivateRefinementIT {
 
-    public PackagePrivateRefinementIT() {}
+    private PackagePrivateRefinementIT() {}
+
+    public PackagePrivateRefinementIT(int a) {}
 }
