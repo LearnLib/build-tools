@@ -25,7 +25,7 @@ import de.learnlib.tooling.it.refinement.SuperInterface;
 public class ExtendingEDSLIT<I, A extends SuperInterface<?>> extends DefaultEDSLIT<I, Boolean, Void, A> {
 
     @Action
-    ExtendingEDSLIT(A automaton) {
+    ExtendingEDSLIT(A automaton) throws Exception {
         super(automaton);
     }
 

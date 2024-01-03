@@ -19,6 +19,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import de.learnlib.tooling.annotation.DocGenType;
 import dk.brics.automaton.RegExp;
 
 /**
@@ -78,10 +79,5 @@ public @interface GenerateEDSL {
      */
     Expr[] where() default {};
 
-    /**
-     * The string which should be copied to the generated class' JavaDoc as-is.
-     *
-     * @return the string which should be copied to the generated class' JavaDoc as-is
-     */
-    String classDoc() default "";
+    DocGenType docGenType() default DocGenType.REFERENCE;
 }

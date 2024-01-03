@@ -19,10 +19,19 @@ import de.learnlib.tooling.annotation.builder.Option;
 import de.learnlib.tooling.it.refinement.SubInterface;
 import de.learnlib.tooling.it.refinement.SuperInterface;
 
+/**
+ * An integration test for testing generics.
+ *
+ * @param <I>
+ *         input type
+ * @param <O>
+ *         output type
+ */
 public class GenericBuilderIT<I, O extends SubInterface<I>> {
 
     @SafeVarargs
     @GenerateBuilder(name = "GenericBuilderITResult")
-    public GenericBuilderIT(int a, I b, SuperInterface<?> c, @Option(requiredOnCreation = true) O... d) throws Exception {}
+    public GenericBuilderIT(int a, I b, SuperInterface<?> c, @Option(requiredOnCreation = true) O... d)
+            throws Exception {}
 
 }

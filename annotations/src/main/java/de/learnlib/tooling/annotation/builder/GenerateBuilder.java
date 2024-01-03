@@ -96,11 +96,4 @@ public @interface GenerateBuilder {
      * @return the name for the create method
      */
     String createName() default "create";
-
-    /**
-     * The string which should be copied to the generated class' JavaDoc as-is.
-     *
-     * @return the string which should be copied to the generated class' JavaDoc as-is
-     */
-    String classDoc() default "";
 }

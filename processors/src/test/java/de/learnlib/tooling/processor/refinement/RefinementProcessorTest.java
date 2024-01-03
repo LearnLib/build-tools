@@ -21,14 +21,16 @@ import com.google.testing.compile.CompilationSubject;
 import com.google.testing.compile.Compiler;
 import de.learnlib.tooling.Util;
 import de.learnlib.tooling.it.refinement.DocRefinementIT;
-import de.learnlib.tooling.it.refinement.DocRefinementITResult;
+import de.learnlib.tooling.it.refinement.DocRefinementIT1Result;
+import de.learnlib.tooling.it.refinement.DocRefinementIT2Result;
+import de.learnlib.tooling.it.refinement.DocRefinementIT3Result;
 import de.learnlib.tooling.it.refinement.Error2RefinementIT;
 import de.learnlib.tooling.it.refinement.ErrorRefinementIT;
 import de.learnlib.tooling.it.refinement.GenericRefinementIT;
 import de.learnlib.tooling.it.refinement.GenericRefinementITResult;
 import de.learnlib.tooling.it.refinement.MultiRefinementIT;
-import de.learnlib.tooling.it.refinement.MultiRefinementITResult1;
-import de.learnlib.tooling.it.refinement.MultiRefinementITResult2;
+import de.learnlib.tooling.it.refinement.MultiRefinementIT1Result;
+import de.learnlib.tooling.it.refinement.MultiRefinementIT2Result;
 import de.learnlib.tooling.it.refinement.PackagePrivateRefinementIT;
 import de.learnlib.tooling.it.refinement.SimpleRefinementIT;
 import de.learnlib.tooling.it.refinement.SimpleRefinementITResult;
@@ -47,9 +49,15 @@ public class RefinementProcessorTest {
 
         final CompilationSubject subject = CompilationSubject.assertThat(compilation);
         subject.succeededWithoutWarnings();
-        subject.generatedSourceFile(Util.toFQN(DocRefinementITResult.class))
+        subject.generatedSourceFile(Util.toFQN(DocRefinementIT1Result.class))
                .contentsAsUtf8String()
-               .isEqualTo(Util.toJFO(DocRefinementITResult.class).getCharContent(false));
+               .isEqualTo(Util.toJFO(DocRefinementIT1Result.class).getCharContent(false));
+        subject.generatedSourceFile(Util.toFQN(DocRefinementIT2Result.class))
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(DocRefinementIT2Result.class).getCharContent(false));
+        subject.generatedSourceFile(Util.toFQN(DocRefinementIT3Result.class))
+               .contentsAsUtf8String()
+               .isEqualTo(Util.toJFO(DocRefinementIT3Result.class).getCharContent(false));
     }
 
     @Test
@@ -85,12 +93,12 @@ public class RefinementProcessorTest {
 
         final CompilationSubject subject = CompilationSubject.assertThat(compilation);
         subject.succeededWithoutWarnings();
-        subject.generatedSourceFile(Util.toFQN(MultiRefinementITResult1.class))
+        subject.generatedSourceFile(Util.toFQN(MultiRefinementIT1Result.class))
                .contentsAsUtf8String()
-               .isEqualTo(Util.toJFO(MultiRefinementITResult1.class).getCharContent(false));
-        subject.generatedSourceFile(Util.toFQN(MultiRefinementITResult2.class))
+               .isEqualTo(Util.toJFO(MultiRefinementIT1Result.class).getCharContent(false));
+        subject.generatedSourceFile(Util.toFQN(MultiRefinementIT2Result.class))
                .contentsAsUtf8String()
-               .isEqualTo(Util.toJFO(MultiRefinementITResult2.class).getCharContent(false));
+               .isEqualTo(Util.toJFO(MultiRefinementIT2Result.class).getCharContent(false));
     }
 
     @Test

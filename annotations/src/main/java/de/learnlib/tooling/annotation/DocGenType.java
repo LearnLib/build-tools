@@ -12,14 +12,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.learnlib.tooling.it.refinement;
+package de.learnlib.tooling.annotation;
 
-import de.learnlib.tooling.annotation.refinement.GenerateRefinement;
-import de.learnlib.tooling.annotation.refinement.Generic;
-
-@GenerateRefinement(name = "Error2RefinementITResult", generics = @Generic("O"), parentGenerics = @Generic("O"))
-@GenerateRefinement(name = "Error2RefinementITResult2")
-public class Error2RefinementIT<I> {
-
-    public Error2RefinementIT(I i) {}
+/**
+ * An enum describing different generation types for documentation.
+ */
+public enum DocGenType {
+    /**
+     * Describes the automatic generation of documentation that simply references existing
+     * methods/constructors/etc.&nbsp; that is being delegated to.
+     */
+    REFERENCE,
+    /**
+     * Describes the copying of existing documentation from the existing methods/constructors/etc.&nbsp; that is being
+     * delegated to.
+     */
+    COPY,
+    /**
+     * Describes the omission of any generation of documentation.
+     */
+    NONE
 }

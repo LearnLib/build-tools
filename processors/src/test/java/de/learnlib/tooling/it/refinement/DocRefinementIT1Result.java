@@ -1,21 +1,24 @@
 package de.learnlib.tooling.it.refinement;
 
 import de.learnlib.tooling.annotation.Generated;
+import java.io.IOException;
 import java.lang.String;
 
 /**
- * This is a refinement of {@link DocRefinementITResult} that binds the type variable I to {@link String} and narrows the {@link SuperInterface} parameter to {@link SubInterface}
- * @param <O> output type
+ * An integration test to test the behavior of document generation.
+ *  <p>
+ *  It contains paragraphs.
+ * @param <O> output symbol type
  */
 @Generated(
         generator = "de.learnlib.tooling.processor.refinement.RefinementProcessor",
         source = "de.learnlib.tooling.it.refinement.DocRefinementIT"
 )
-public class DocRefinementITResult<O> extends DocRefinementIT<String, O> {
+public class DocRefinementIT1Result<O> extends DocRefinementIT<String, O> {
     /**
      *  This is a default constructor that uses the (Java) default values for all its internal fields.
      */
-    public DocRefinementITResult() {
+    public DocRefinementIT1Result() {
         super();
     }
 
@@ -27,7 +30,7 @@ public class DocRefinementITResult<O> extends DocRefinementIT<String, O> {
      *
      *  @see DocRefinementIT#DocRefinementIT(Object, SuperInterface)
      */
-    public DocRefinementITResult(String input) {
+    public DocRefinementIT1Result(String input) {
         super(input);
     }
 
@@ -38,8 +41,11 @@ public class DocRefinementITResult<O> extends DocRefinementIT<String, O> {
      *          this first input
      *  @param input2
      *          the second input
+     *
+     *  @throws IOException
+     *          when things go bad
      */
-    public DocRefinementITResult(String input1, SubInterface<O> input2) {
+    public DocRefinementIT1Result(String input1, SubInterface<O> input2) throws IOException {
         super(input1, input2);
     }
 }

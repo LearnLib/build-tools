@@ -20,7 +20,7 @@ import de.learnlib.tooling.annotation.refinement.Interface;
 import de.learnlib.tooling.annotation.refinement.Mapping;
 
 @GenerateRefinement(name = "SingleRefinementITResult",
-                    generics = "M",
+                    generics = @Generic("M"),
                     parentGenerics = {@Generic("M"), @Generic(clazz = Boolean.class)},
                     typeMapping = {@Mapping(from = SuperInterface.class, to = SubInterface.class, generics = @Generic("M")),
                                    @Mapping(from = SuperInterface2.class,

@@ -23,8 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -38,12 +39,11 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.WildcardType;
 import javax.lang.model.util.ElementFilter;
-import javax.lang.model.util.Elements;
 import javax.lang.model.util.Elements.Origin;
-import javax.lang.model.util.Types;
 
 import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -51,28 +51,21 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 import com.squareup.javapoet.WildcardTypeName;
+import com.sun.source.doctree.DocCommentTree;
+import de.learnlib.tooling.annotation.DocGenType;
 import de.learnlib.tooling.annotation.refinement.GenerateRefinement;
 import de.learnlib.tooling.annotation.refinement.GenerateRefinements;
 import de.learnlib.tooling.annotation.refinement.Generic;
 import de.learnlib.tooling.annotation.refinement.Interface;
 import de.learnlib.tooling.annotation.refinement.Mapping;
 import de.learnlib.tooling.processor.AbstractLearnLibProcessor;
+import de.learnlib.tooling.processor.DocCommentVisitor;
 
 public class RefinementProcessor extends AbstractLearnLibProcessor {
-
-    private Types typeUtils;
-    private Elements elementUtils;
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
         return new HashSet<>(Arrays.asList(GenerateRefinement.class.getName(), GenerateRefinements.class.getName()));
-    }
-
-    @Override
-    public void init(ProcessingEnvironment processingEnv) {
-        super.init(processingEnv);
-        this.typeUtils = super.processingEnv.getTypeUtils();
-        this.elementUtils = super.processingEnv.getElementUtils();
     }
 
     @Override
@@ -119,17 +112,28 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
         final TypeSpec.Builder builder =
                 TypeSpec.classBuilder(annotation.name()).addAnnotation(super.createGeneratedAnnotation(annotatedClass));
 
-        final String classDoc = annotation.classDoc();
-        if (classDoc != null && !classDoc.isEmpty()) {
-            builder.addJavadoc(classDoc);
-        }
-
         if (annotation.classPublic()) {
             builder.addModifiers(Modifier.PUBLIC);
         }
 
-        for (String typeParameter : annotation.generics()) {
-            builder.addTypeVariable(TypeVariableName.get(typeParameter));
+        switch (annotation.docGenType()) {
+            case REFERENCE:
+                builder.addJavadoc("A type-specific refinement of {@link $T}.\n", ClassName.get(annotatedClass));
+                break;
+            case COPY:
+                final DocCommentTree docCommentTree = super.docUtils.getDocCommentTree(annotatedClass);
+                final DocCommentVisitor docCommentVisitor = new DocCommentVisitor(builder::addJavadoc);
+                docCommentVisitor.scan(docCommentTree, null);
+                break;
+            case NONE:
+            default:
+                // do nothing
+        }
+
+        for (Generic generic : annotation.generics()) {
+            final String name = generic.value();
+            builder.addTypeVariable(TypeVariableName.get(name));
+            builder.addJavadoc("@param <$L> $L\n", name, generic.desc());
         }
 
         return builder;
@@ -180,7 +184,7 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
         final Mapping[] typeMapping = annotation.typeMapping();
         final List<ExecutableElement> constructors = ElementFilter.constructorsIn(annotatedClass.getEnclosedElements());
         final boolean onlyDefault =
-                constructors.size() == 1 && this.elementUtils.getOrigin(constructors.get(0)) != Origin.EXPLICIT;
+                constructors.size() == 1 && super.elementUtils.getOrigin(constructors.get(0)) != Origin.EXPLICIT;
 
         if (!onlyDefault) {
             constructor:
@@ -207,6 +211,10 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
 
                     mBuilder.addStatement(superJoiner.toString());
                     mBuilder.varargs(constructor.isVarArgs());
+                    mBuilder.addExceptions(constructor.getThrownTypes()
+                                                      .stream()
+                                                      .map(TypeName::get)
+                                                      .collect(Collectors.toList()));
 
                     if (constructor.isVarArgs() && super.requiresSafeVarargs(mBuilder)) {
                         mBuilder.addAnnotation(SafeVarargs.class);
@@ -216,12 +224,7 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
                         mBuilder.addModifiers(Modifier.PUBLIC);
                     }
 
-                    if (annotation.copyConstructorDoc()) {
-                        final String doc = this.elementUtils.getDocComment(constructor);
-                        if (doc != null) {
-                            mBuilder.addJavadoc(doc);
-                        }
-                    }
+                    addConstructorDocumentation(constructor, annotation.docGenType(), mBuilder::addJavadoc);
 
                     builder.addMethod(mBuilder.build());
                 }
@@ -271,7 +274,7 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
             case DECLARED:
                 for (Mapping mapping : typeMapping) {
                     final TypeMirror from = super.getClassValue(mapping, Mapping::from);
-                    if (this.typeUtils.isSameType(this.typeUtils.erasure(typeMirror), from)) {
+                    if (super.typeUtils.isSameType(super.typeUtils.erasure(typeMirror), from)) {
                         final TypeMirror to = super.getClassValue(mapping, Mapping::to);
                         final Generic[] generics = mapping.generics();
                         return toTypeName(to, generics);
@@ -347,6 +350,10 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
         }
 
         return typeNames;
+    }
+
+    private void addConstructorDocumentation(ExecutableElement e, DocGenType type, Consumer<CodeBlock> consumer) {
+        super.addReferentialDocumentation(e, type, consumer, "Delegates to ", ".");
     }
 
 }

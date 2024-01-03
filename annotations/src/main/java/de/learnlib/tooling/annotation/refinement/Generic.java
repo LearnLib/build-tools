@@ -33,6 +33,8 @@ public @interface Generic {
      */
     String value() default "";
 
+    String desc() default "";
+
     /**
      * A referential representation of a type parameter.
      *

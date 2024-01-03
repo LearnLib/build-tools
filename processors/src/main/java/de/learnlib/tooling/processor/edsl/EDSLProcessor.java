@@ -29,6 +29,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -55,10 +56,13 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeSpec.Builder;
 import com.squareup.javapoet.TypeVariableName;
+import com.sun.source.doctree.DocCommentTree;
+import de.learnlib.tooling.annotation.DocGenType;
 import de.learnlib.tooling.annotation.edsl.Action;
 import de.learnlib.tooling.annotation.edsl.Expr;
 import de.learnlib.tooling.annotation.edsl.GenerateEDSL;
 import de.learnlib.tooling.processor.AbstractLearnLibProcessor;
+import de.learnlib.tooling.processor.ParamVisitor;
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.RegExp;
 import dk.brics.automaton.State;
@@ -72,9 +76,9 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
 
     @Override
     public void init(ProcessingEnvironment processingEnv) {
+        super.init(processingEnv);
         // set this property so that the BRICS automaton has a deterministic state iteration order
         System.setProperty("dk.brics.automaton.debug", "true");
-        super.init(processingEnv);
     }
 
     @Override
@@ -98,6 +102,7 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
                     annotation.classPublic() ? new Modifier[] {Modifier.PUBLIC} : new Modifier[0];
             final Modifier[] constructorModifiers =
                     annotation.constructorPublic() ? new Modifier[] {Modifier.PUBLIC} : new Modifier[0];
+            final DocGenType docGenType = annotation.docGenType();
 
             final List<String> tokens = getTokens(syntax);
             final Map<String, Character> token2Label = new HashMap<>();
@@ -125,8 +130,12 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
 
             if (isClass && !constructors.isEmpty()) {
                 for (ExecutableElement c : constructors) {
-                    final MethodSpec.Builder cBuilder =
-                            MethodSpec.constructorBuilder().addModifiers(constructorModifiers);
+                    final MethodSpec.Builder cBuilder = MethodSpec.constructorBuilder()
+                                                                  .addModifiers(constructorModifiers)
+                                                                  .addExceptions(c.getThrownTypes()
+                                                                                  .stream()
+                                                                                  .map(TypeName::get)
+                                                                                  .collect(Collectors.toList()));
                     final StringJoiner sj = new StringJoiner(", ", "$N = new $T(", ")");
                     for (VariableElement p : c.getParameters()) {
                         String pName = p.getSimpleName().toString();
@@ -134,15 +143,21 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
                         sj.add(pName);
                     }
                     cBuilder.addStatement(CodeBlock.of(sj.toString(), delegate, sourceType));
+                    addConstructorDocumentation(c, docGenType, cBuilder::addJavadoc);
                     targetBuilder.addMethod(cBuilder.build());
                 }
             } else {
-                final String orig = "orig";
-                targetBuilder.addMethod(MethodSpec.constructorBuilder()
-                                                  .addModifiers(constructorModifiers)
-                                                  .addParameter(sourceType, orig)
-                                                  .addStatement("$N = $N", delegate, orig)
-                                                  .build());
+                final String param = "delegate";
+                final MethodSpec.Builder cBuilder = MethodSpec.constructorBuilder()
+                                                              .addModifiers(constructorModifiers)
+                                                              .addParameter(sourceType, param)
+                                                              .addStatement("this.$N = $N", delegate, param);
+                if (docGenType != DocGenType.NONE) {
+                    cBuilder.addJavadoc(
+                                    "Constructs a fluent interface using the provided object to delegate actions to.\n")
+                            .addJavadoc("@param $N the object to delegate actions to", param);
+                }
+                targetBuilder.addMethod(cBuilder.build());
             }
 
             // generate state classes
@@ -169,6 +184,9 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
                                        .addMethod(MethodSpec.constructorBuilder()
                                                             .addModifiers(Modifier.PRIVATE)
                                                             .build());
+                    if (docGenType != DocGenType.NONE) {
+                        cBuilder.addJavadoc("A state (-class) of the enclosing fluent interface.");
+                    }
                 }
 
                 final MethodSpec.Builder mBuilder = MethodSpec.methodBuilder("get" + cName.simpleName())
@@ -223,6 +241,9 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
                             if (m.isVarArgs() && super.requiresSafeVarargs(methodBuilder)) {
                                 methodBuilder.addModifiers(Modifier.FINAL).addAnnotation(SafeVarargs.class);
                             }
+
+                            addDelegateDocumentation(m, docGenType, methodBuilder::addJavadoc);
+                            addReturnDocumentation(m, docGenType, methodBuilder::addJavadoc);
 
                             final CodeBlock callDelegate = CodeBlock.of(sj.toString(), delegate, m.getSimpleName());
                             final Action ann = m.getAnnotation(Action.class);
@@ -381,21 +402,15 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
     }
 
     private List<Element> getAnnotatedElements(TypeElement clazz) {
-        return super.processingEnv.getElementUtils()
-                                  .getAllMembers(clazz)
-                                  .stream()
-                                  .filter(e -> e.getAnnotation(Action.class) != null)
-                                  .collect(Collectors.toList());
+        return super.elementUtils.getAllMembers(clazz)
+                                 .stream()
+                                 .filter(e -> e.getAnnotation(Action.class) != null)
+                                 .collect(Collectors.toList());
     }
 
     private TypeSpec.Builder createBuilder(Element element, GenerateEDSL annotation, ClassName name) {
         final TypeSpec.Builder builder =
                 TypeSpec.classBuilder(name).addAnnotation(super.createGeneratedAnnotation(element));
-
-        final String classDoc = annotation.classDoc();
-        if (classDoc != null && !classDoc.isEmpty()) {
-            builder.addJavadoc(classDoc);
-        }
 
         final DeclaredType clazz = (DeclaredType) element.asType();
 
@@ -408,6 +423,51 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
             builder.addModifiers(Modifier.PUBLIC);
         }
 
+        switch (annotation.docGenType()) {
+            case REFERENCE:
+                builder.addJavadoc("A fluent interface for {@link $T}.\n", super.typeUtils.erasure(element.asType()));
+                final DocCommentTree docCommentTree = super.docUtils.getDocCommentTree(element);
+                final ParamVisitor paramVisitor = new ParamVisitor(builder::addJavadoc);
+                paramVisitor.scan(docCommentTree, null);
+                break;
+            case COPY:
+                final String classDoc = super.elementUtils.getDocComment(element);
+                if (classDoc != null && !classDoc.isEmpty()) {
+                    builder.addJavadoc(classDoc);
+                }
+                break;
+            case NONE:
+            default:
+                // do nothing
+        }
+
         return builder;
+    }
+
+    private void addConstructorDocumentation(ExecutableElement e, DocGenType type, Consumer<CodeBlock> consumer) {
+        super.addReferentialDocumentation(e,
+                                          type,
+                                          consumer,
+                                          "Constructs a fluent interface using ",
+                                          " to construct the object to delegate actions to.");
+    }
+
+    private void addDelegateDocumentation(ExecutableElement e, DocGenType type, Consumer<CodeBlock> consumer) {
+        super.addReferentialDocumentation(e, type, consumer, "Delegates to ", ".");
+    }
+
+    private void addReturnDocumentation(ExecutableElement e, DocGenType type, Consumer<CodeBlock> consumer) {
+        final String doc = super.elementUtils.getDocComment(e);
+
+        if (type == DocGenType.REFERENCE ||
+            type == DocGenType.COPY && doc != null && !doc.contains("@return")) {
+            if (e.getAnnotation(Action.class).isTerminating()) {
+                if (e.getReturnType().getKind() != TypeKind.VOID) {
+                    consumer.accept(CodeBlock.of("@return the result of the delegate"));
+                }
+            } else {
+                consumer.accept(CodeBlock.of("@return the next fluent state"));
+            }
+        }
     }
 }

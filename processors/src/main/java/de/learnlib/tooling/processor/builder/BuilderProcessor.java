@@ -41,9 +41,11 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
+import com.sun.source.doctree.DocCommentTree;
 import de.learnlib.tooling.annotation.builder.GenerateBuilder;
 import de.learnlib.tooling.annotation.builder.Option;
 import de.learnlib.tooling.processor.AbstractLearnLibProcessor;
+import de.learnlib.tooling.processor.ParamVisitor;
 
 public class BuilderProcessor extends AbstractLearnLibProcessor {
 
@@ -85,15 +87,16 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
             final TypeName targetType = ClassName.get(clazz.asType());
 
             final TypeSpec.Builder classBuilder = createBuilder(clazz, annotation, builderName);
-            final MethodSpec.Builder constructorBuilder =
-                    MethodSpec.constructorBuilder().addModifiers(constructorModifiers);
+            final MethodSpec.Builder constructorBuilder = MethodSpec.constructorBuilder()
+                                                                    .addModifiers(constructorModifiers)
+                                                                    .addJavadoc(
+                                                                            "Creates a new builder (and may set default values for some parameters).\n");
             final MethodSpec.Builder createBuilder = MethodSpec.methodBuilder(create)
                                                                .addModifiers(classModifiers)
                                                                .returns(targetType)
-                                                               .addExceptions(constructor.getThrownTypes()
-                                                                                         .stream()
-                                                                                         .map(TypeName::get)
-                                                                                         .collect(Collectors.toList()));
+                                                               .addJavadoc(
+                                                                       "Creates the {@link $T} instance with the configured parameters.\n",
+                                                                       super.typeUtils.erasure(clazz.asType()));
 
             final List<? extends VariableElement> params = constructor.getParameters();
             final StringJoiner returnJoiner = new StringJoiner(", ", "return new $T(", ")");
@@ -132,6 +135,9 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
                 if (paramAnnotation != null && paramAnnotation.requiredOnInstantiation()) {
                     constructorBuilder.addParameter(fieldTypeName, fieldName);
                     constructorBuilder.addStatement(CodeBlock.of("this.$N = $N", fieldName, fieldName));
+                    constructorBuilder.addJavadoc("@param $N the value used to initialize parameter {@code $N}\n",
+                                                  fieldName,
+                                                  fieldName);
                 } else if (defaultsValues.contains(fieldName)) {
                     constructorBuilder.addStatement(CodeBlock.of("this.$N = $L.$N()",
                                                                  fieldName,
@@ -148,7 +154,11 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
                                 MethodSpec.methodBuilder(annotation.getterPrefix() + getterName)
                                           .addModifiers(classModifiers)
                                           .returns(fieldTypeName)
-                                          .addStatement("return this.$N", fieldName);
+                                          .addStatement("return this.$N", fieldName)
+                                          .addJavadoc("Returns the current value for the parameter {@code $N}.\n",
+                                                      fieldName)
+                                          .addJavadoc("@return the current value for the parameter {@code $N}",
+                                                      fieldName);
                         classBuilder.addMethod(getterBuilder.build());
                     }
                 }
@@ -163,7 +173,11 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
                                           .addModifiers(classModifiers)
                                           .varargs(isVarArgs)
                                           .addParameter(fieldTypeName, fieldName)
-                                          .addStatement("this.$N = $N", fieldName, fieldName);
+                                          .addStatement("this.$N = $N", fieldName, fieldName)
+                                          .addJavadoc("Sets the new value for the parameter {@code $N}.\n", fieldName)
+                                          .addJavadoc("@param $N the new value for the parameter {@code $N}",
+                                                      fieldName,
+                                                      fieldName);
                         if (isVarArgs && super.requiresSafeVarargs(setterBuilder)) {
                             setterBuilder.addModifiers(Modifier.FINAL).addAnnotation(SafeVarargs.class);
                         }
@@ -183,7 +197,14 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
                                           .returns(builderType)
                                           .addParameter(fieldTypeName, fieldName)
                                           .addStatement("this.$N = $N", fieldName, fieldName)
-                                          .addStatement("return this");
+                                          .addStatement("return this")
+                                          .addJavadoc(
+                                                  "Sets the new value for the parameter {@code $N} and returns {@code this} builder instance.\n",
+                                                  fieldName)
+                                          .addJavadoc("@param $N the new value for the parameter {@code $N}\n",
+                                                      fieldName,
+                                                      fieldName)
+                                          .addJavadoc("@return the current builder instance");
                         if (isVarArgs && super.requiresSafeVarargs(withBuilder)) {
                             withBuilder.addModifiers(Modifier.FINAL).addAnnotation(SafeVarargs.class);
                         }
@@ -193,7 +214,11 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
 
                 // create
                 if (paramAnnotation != null && paramAnnotation.requiredOnCreation()) {
-                    createBuilder.varargs(isVarArgs).addParameter(fieldTypeName, fieldName);
+                    createBuilder.varargs(isVarArgs)
+                                 .addParameter(fieldTypeName, fieldName)
+                                 .addJavadoc("@param $N the value used for the parameter {@code $N}\n",
+                                             fieldName,
+                                             fieldName);
                     if (isVarArgs && super.requiresSafeVarargs(createBuilder)) {
                         createBuilder.addModifiers(Modifier.FINAL).addAnnotation(SafeVarargs.class);
                     }
@@ -201,6 +226,12 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
             }
 
             createBuilder.addStatement(returnJoiner.toString(), ClassName.get(clazz.asType()));
+            createBuilder.addJavadoc("@return the created instance\n");
+
+            for (TypeMirror ex : constructor.getThrownTypes()) {
+                createBuilder.addException(TypeName.get(ex));
+                createBuilder.addJavadoc("@throws $T if instantiating the object throws this exception", ex);
+            }
 
             classBuilder.addMethod(constructorBuilder.build());
             classBuilder.addMethod(createBuilder.build());
@@ -253,11 +284,6 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
         final TypeSpec.Builder builder =
                 TypeSpec.classBuilder(name).addAnnotation(super.createGeneratedAnnotation(element));
 
-        final String classDoc = annotation.classDoc();
-        if (classDoc != null && !classDoc.isEmpty()) {
-            builder.addJavadoc(classDoc);
-        }
-
         final DeclaredType clazz = (DeclaredType) element.asType();
 
         for (TypeMirror ta : clazz.getTypeArguments()) {
@@ -269,6 +295,13 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
         if (annotation.classPublic()) {
             builder.addModifiers(Modifier.PUBLIC);
         }
+
+        builder.addJavadoc("A builder for constructing {@link $T} instances.\n",
+                           super.typeUtils.erasure(element.asType()));
+
+        final DocCommentTree docCommentTree = super.docUtils.getDocCommentTree(element);
+        final ParamVisitor paramVisitor = new ParamVisitor(builder::addJavadoc);
+        paramVisitor.scan(docCommentTree, null);
 
         return builder;
     }

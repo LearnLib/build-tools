@@ -20,6 +20,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import de.learnlib.tooling.annotation.DocGenType;
+
 /**
  * Annotation to indicate that a subclass with the specified configuration should be generated. Currently only supports
  * classes and the modification of type parameters, constructor parameters, and implemented interfaces. The generated
@@ -50,7 +52,7 @@ public @interface GenerateRefinement {
      *
      * @return the type variables the refinement should have
      */
-    String[] generics() default {};
+    Generic[] generics() default {};
 
     /**
      * The values for the generics of the parent (i.e. the class annotated by {@code this} annotation) class.
@@ -88,18 +90,11 @@ public @interface GenerateRefinement {
     boolean constructorPublic() default true;
 
     /**
-     * The string which should be copied to the generated class' JavaDoc as-is.
-     *
-     * @return the string which should be copied to the generated class' JavaDoc as-is
-     */
-    String classDoc() default "";
-
-    /**
      * A flag indicating whether the JavaDoc of the parent class' constructors should be copied (as-is) to the
      * refinement's constructors.
      *
      * @return {@code true} if the JavaDoc of the constructors should be copied, {@code false} otherwise
      */
-    boolean copyConstructorDoc() default true;
+    DocGenType docGenType() default DocGenType.REFERENCE;
 
 }

@@ -14,18 +14,35 @@
  */
 package de.learnlib.tooling.it.refinement;
 
+import java.io.IOException;
+
+import de.learnlib.tooling.annotation.DocGenType;
 import de.learnlib.tooling.annotation.refinement.GenerateRefinement;
 import de.learnlib.tooling.annotation.refinement.Generic;
 import de.learnlib.tooling.annotation.refinement.Mapping;
 
-@GenerateRefinement(name = "DocRefinementITResult",
-                    generics = "O",
+/**
+ * An integration test to test the behavior of document generation.
+ * <p>
+ * It contains paragraphs.
+ *
+ * @param <I>
+ *         input type
+ * @param <O>
+ *         output type
+ */
+@GenerateRefinement(name = "DocRefinementIT1Result",
+                    generics = @Generic(value = "O", desc = "output symbol type"),
                     parentGenerics = {@Generic(clazz = String.class), @Generic("O")},
                     typeMapping = {@Mapping(from = SuperInterface.class,
                                             to = SubInterface.class,
                                             generics = @Generic("O"))},
-                    classDoc = "This is a refinement of {@link DocRefinementITResult} that binds the type variable I to {@link String} and narrows the {@link SuperInterface} parameter to {@link SubInterface}\n" +
-                               "@param <O> output type\n")
+                    docGenType = DocGenType.COPY)
+@GenerateRefinement(name = "DocRefinementIT2Result",
+                    parentGenerics = {@Generic(clazz = String.class), @Generic(clazz = Boolean.class)})
+@GenerateRefinement(name = "DocRefinementIT3Result",
+                    parentGenerics = {@Generic(clazz = String.class), @Generic(clazz = Boolean.class)},
+                    docGenType = DocGenType.NONE)
 public class DocRefinementIT<I, O> {
 
     /**
@@ -41,9 +58,7 @@ public class DocRefinementIT<I, O> {
      *
      * @see DocRefinementIT#DocRefinementIT(Object, SuperInterface)
      */
-    public DocRefinementIT(I input) {
-        this(input, null);
-    }
+    public DocRefinementIT(I input) {}
 
     /**
      * This third constructor takes all this class' inputs as arguments.
@@ -52,8 +67,11 @@ public class DocRefinementIT<I, O> {
      *         this first input
      * @param input2
      *         the second input
+     *
+     * @throws IOException
+     *         when things go bad
      */
-    public DocRefinementIT(I input1, SuperInterface<O> input2) {}
+    public DocRefinementIT(I input1, SuperInterface<O> input2) throws IOException {}
 
 }
 

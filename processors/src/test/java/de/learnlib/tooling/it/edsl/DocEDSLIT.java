@@ -14,21 +14,43 @@
  */
 package de.learnlib.tooling.it.edsl;
 
+import de.learnlib.tooling.annotation.DocGenType;
 import de.learnlib.tooling.annotation.edsl.Action;
 import de.learnlib.tooling.annotation.edsl.GenerateEDSL;
-import org.checkerframework.checker.units.qual.A;
 
+/**
+ * A custom description for {@link DocEDSLIT}.
+ *
+ * @param <SP>
+ *         state property
+ * @param <A>
+ *         automaton type
+ */
 @GenerateEDSL(name = "DocEDSLITResult",
               syntax = "(withStateProperty|withInitial)* create",
-              classDoc = "A fluent interface for {@link DocEDSLIT}.\n<p>\n@param <SP> state property\n@param <A> automaton type\n")
+              docGenType = DocGenType.COPY)
 public class DocEDSLIT<SP, A> {
 
+    /**
+     * Marks the state identified by the given object as initial.
+     *
+     * @param stateId
+     *         the object to identify the state
+     */
     @Action
     public void withInitial(Object stateId) {}
 
+    /*
+     * do not fail in missing doc
+     */
     @Action
     public void withStateProperty(SP stateProperty, Object stateId) {}
 
+    /**
+     * Returns the final object.
+     *
+     * @return the final object
+     */
     @Action(isTerminating = true)
     public A create() {
         return null;

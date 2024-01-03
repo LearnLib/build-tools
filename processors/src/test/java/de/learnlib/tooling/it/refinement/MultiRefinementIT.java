@@ -18,14 +18,14 @@ import de.learnlib.tooling.annotation.refinement.GenerateRefinement;
 import de.learnlib.tooling.annotation.refinement.Generic;
 import de.learnlib.tooling.annotation.refinement.Mapping;
 
-@GenerateRefinement(name = "MultiRefinementITResult1",
-                    generics = "M",
+@GenerateRefinement(name = "MultiRefinementIT1Result",
+                    generics = @Generic("M"),
                     parentGenerics = @Generic("M"),
                     typeMapping = {@Mapping(from = Object.class, to = String.class),
                                    @Mapping(from = SuperInterface.class,
                                             to = SubInterface.class,
                                             generics = @Generic(clazz = SuperInterface2.class, generics = "M"))})
-@GenerateRefinement(name = "MultiRefinementITResult2", parentGenerics = @Generic(clazz = String[].class))
+@GenerateRefinement(name = "MultiRefinementIT2Result", parentGenerics = @Generic(clazz = String[].class))
 public class MultiRefinementIT<I> implements SuperInterface<I> {
 
     public MultiRefinementIT(int[] param1, Object[] param2) {}

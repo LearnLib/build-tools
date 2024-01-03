@@ -14,10 +14,11 @@
  */
 package de.learnlib.tooling.it.edsl;
 
+import de.learnlib.tooling.annotation.DocGenType;
 import de.learnlib.tooling.annotation.edsl.Action;
 import de.learnlib.tooling.annotation.edsl.GenerateEDSL;
 
-@GenerateEDSL(name = "EmptyEDSLITResult", syntax = "done")
+@GenerateEDSL(name = "EmptyEDSLITResult", syntax = "done", docGenType = DocGenType.NONE)
 public class EmptyEDSLIT {
 
     @Action(isTerminating = true)

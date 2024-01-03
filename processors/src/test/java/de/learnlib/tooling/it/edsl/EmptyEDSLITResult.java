@@ -10,8 +10,8 @@ import java.lang.String;
 public class EmptyEDSLITResult {
     private final EmptyEDSLIT delegate;
 
-    public EmptyEDSLITResult(EmptyEDSLIT orig) {
-        delegate = orig;
+    public EmptyEDSLITResult(EmptyEDSLIT delegate) {
+        this.delegate = delegate;
     }
 
     private EmptyEDSLITResult getEmptyEDSLITResult() {

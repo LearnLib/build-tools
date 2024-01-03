@@ -3,6 +3,9 @@ package de.learnlib.tooling.it.edsl;
 import de.learnlib.tooling.annotation.Generated;
 import java.lang.String;
 
+/**
+ * A fluent interface for {@link OverlappingEDSLIT}.
+ */
 @Generated(
         generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
         source = "de.learnlib.tooling.it.edsl.OverlappingEDSLIT"
@@ -18,6 +21,9 @@ public class OverlappingEDSLITResult {
 
     private OverlappingEDSLITResult3 OverlappingEDSLITResult3;
 
+    /**
+     * Constructs a fluent interface using {@link OverlappingEDSLIT#OverlappingEDSLIT()} to construct the object to delegate actions to.
+     */
     public OverlappingEDSLITResult() {
         delegate = new OverlappingEDSLIT();
     }
@@ -54,53 +60,95 @@ public class OverlappingEDSLITResult {
         return OverlappingEDSLITResult3;
     }
 
+    /**
+     * Delegates to {@link OverlappingEDSLIT#aaa()}.
+     * @return the next fluent state
+     */
     public OverlappingEDSLITResult0 aaa() {
         delegate.aaa();
         return getOverlappingEDSLITResult0();
     }
 
+    /**
+     * Delegates to {@link OverlappingEDSLIT#aa()}.
+     * @return the next fluent state
+     */
     public OverlappingEDSLITResult1 aa() {
         delegate.aa();
         return getOverlappingEDSLITResult1();
     }
 
+    /**
+     * Delegates to {@link OverlappingEDSLIT#aa(String)}.
+     * @param arg maps to the {@code arg} parameter of the delegate
+     * @return the result of the delegate
+     */
     public String aa(String arg) {
         return delegate.aa(arg);
     }
 
+    /**
+     * A state (-class) of the enclosing fluent interface.
+     */
     public final class OverlappingEDSLITResult0 {
         private OverlappingEDSLITResult0() {
         }
 
+        /**
+         * Delegates to {@link OverlappingEDSLIT#a()}.
+         * @return the next fluent state
+         */
         public OverlappingEDSLITResult2 a() {
             delegate.a();
             return getOverlappingEDSLITResult2();
         }
     }
 
+    /**
+     * A state (-class) of the enclosing fluent interface.
+     */
     public final class OverlappingEDSLITResult1 {
         private OverlappingEDSLITResult1() {
         }
     }
 
+    /**
+     * A state (-class) of the enclosing fluent interface.
+     */
     public final class OverlappingEDSLITResult2 {
         private OverlappingEDSLITResult2() {
         }
 
+        /**
+         * Delegates to {@link OverlappingEDSLIT#aa()}.
+         * @return the next fluent state
+         */
         public OverlappingEDSLITResult3 aa() {
             delegate.aa();
             return getOverlappingEDSLITResult3();
         }
 
+        /**
+         * Delegates to {@link OverlappingEDSLIT#aa(String)}.
+         * @param arg maps to the {@code arg} parameter of the delegate
+         * @return the result of the delegate
+         */
         public String aa(String arg) {
             return delegate.aa(arg);
         }
     }
 
+    /**
+     * A state (-class) of the enclosing fluent interface.
+     */
     public final class OverlappingEDSLITResult3 {
         private OverlappingEDSLITResult3() {
         }
 
+        /**
+         * Delegates to {@link OverlappingEDSLIT#aaa()}.
+         * @return the next fluent state
+         */
         public OverlappingEDSLITResult0 aaa() {
             delegate.aaa();
             return getOverlappingEDSLITResult0();

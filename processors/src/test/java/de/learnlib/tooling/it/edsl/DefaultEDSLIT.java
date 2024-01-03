@@ -19,6 +19,15 @@ import de.learnlib.tooling.annotation.edsl.GenerateEDSL;
 
 /**
  * Simplified test based on an AutomataLib use-case.
+ *
+ * @param <I>
+ *         input symbol type
+ * @param <SP>
+ *         state property type
+ * @param <TP>
+ *         transition property type
+ * @param <A>
+ *         automaton type
  */
 @GenerateEDSL(name = "DefaultEDSLITResult",
               syntax = "((from (on (withProperty? (to* loop? to*))+)+)|withStateProperty|withInitial)* create")
@@ -27,11 +36,11 @@ public class DefaultEDSLIT<I, SP, TP, A> {
     private final A a;
 
     DefaultEDSLIT() {
-        this(null);
+        this.a = null;
     }
 
     @Action
-    DefaultEDSLIT(A a) {
+    DefaultEDSLIT(A a) throws Exception {
         this.a = a;
     }
 

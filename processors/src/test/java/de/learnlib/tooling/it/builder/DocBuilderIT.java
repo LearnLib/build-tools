@@ -16,10 +16,18 @@ package de.learnlib.tooling.it.builder;
 
 import de.learnlib.tooling.annotation.builder.GenerateBuilder;
 
-public class DocBuilderIT {
+/**
+ * This is an integration tests that tests the copying of @param descriptions.
+ *
+ * @param <T1>
+ *         the first type
+ * @param <T2>
+ *         the second type description
+ *         that spans over multiple lines
+ */
+public class DocBuilderIT<T1, T2> {
 
-    @GenerateBuilder(name = "DocBuilderITResult",
-                     classDoc = "This is a builder class for constructing {@link DocBuilderIT}s.")
+    @GenerateBuilder(name = "DocBuilderITResult")
     public DocBuilderIT() {}
 
 }
