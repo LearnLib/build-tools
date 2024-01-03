@@ -26,6 +26,6 @@ public interface InterfaceEDSLIT {
     @Action
     void pong();
 
-    @Action(isTerminating = true)
+    @Action(terminating = true)
     void exit();
 }

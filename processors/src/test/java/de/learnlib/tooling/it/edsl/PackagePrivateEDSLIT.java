@@ -24,7 +24,7 @@ import de.learnlib.tooling.annotation.edsl.GenerateEDSL;
               constructorPublic = false)
 public class PackagePrivateEDSLIT {
 
-    @Action(isTerminating = true)
+    @Action(terminating = true)
     public String done() {
         return "done";
     }

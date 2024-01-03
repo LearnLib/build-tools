@@ -23,7 +23,7 @@ public class ErrorEDSLIT<I, SP, TP, A> {
     @Action
     ErrorEDSLIT() {}
 
-    @Action(isTerminating = true)
+    @Action(terminating = true)
     public void existing() {}
 
 }

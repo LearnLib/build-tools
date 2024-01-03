@@ -59,7 +59,7 @@ import de.learnlib.tooling.annotation.refinement.Generic;
 import de.learnlib.tooling.annotation.refinement.Interface;
 import de.learnlib.tooling.annotation.refinement.Mapping;
 import de.learnlib.tooling.processor.AbstractLearnLibProcessor;
-import de.learnlib.tooling.processor.DocCommentVisitor;
+import de.learnlib.tooling.processor.CommentVisitor;
 
 public class RefinementProcessor extends AbstractLearnLibProcessor {
 
@@ -122,8 +122,8 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
                 break;
             case COPY:
                 final DocCommentTree docCommentTree = super.docUtils.getDocCommentTree(annotatedClass);
-                final DocCommentVisitor docCommentVisitor = new DocCommentVisitor(builder::addJavadoc);
-                docCommentVisitor.scan(docCommentTree, null);
+                final CommentVisitor commentVisitor = new CommentVisitor(builder::addJavadoc);
+                commentVisitor.scan(docCommentTree, null);
                 break;
             case NONE:
             default:
@@ -181,7 +181,7 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
                                  GenerateRefinement annotation,
                                  Map<String, Generic> typeVarMap) {
 
-        final Mapping[] typeMapping = annotation.typeMapping();
+        final Mapping[] typeMapping = annotation.typeMappings();
         final List<ExecutableElement> constructors = ElementFilter.constructorsIn(annotatedClass.getEnclosedElements());
         final boolean onlyDefault =
                 constructors.size() == 1 && super.elementUtils.getOrigin(constructors.get(0)) != Origin.EXPLICIT;

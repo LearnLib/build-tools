@@ -183,7 +183,8 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
                                        .addModifiers(Modifier.FINAL)
                                        .addMethod(MethodSpec.constructorBuilder()
                                                             .addModifiers(Modifier.PRIVATE)
-                                                            .build());
+                                                            .build())
+                                       .addAnnotation(super.createGeneratedAnnotation(elem));
                     if (docGenType != DocGenType.NONE) {
                         cBuilder.addJavadoc("A state (-class) of the enclosing fluent interface.");
                     }
@@ -247,7 +248,7 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
 
                             final CodeBlock callDelegate = CodeBlock.of(sj.toString(), delegate, m.getSimpleName());
                             final Action ann = m.getAnnotation(Action.class);
-                            if (ann != null && ann.isTerminating() && succ.isAccept()) {
+                            if (ann != null && ann.terminating() && succ.isAccept()) {
                                 final CodeBlock.Builder sBuilder = CodeBlock.builder();
                                 if (m.getReturnType().getKind() != TypeKind.VOID) {
                                     sBuilder.add(CodeBlock.of("return "));
@@ -257,7 +258,7 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
                                              .returns(ParameterizedTypeName.get(m.getReturnType()));
                                 builder.addMethod(methodBuilder.build());
                             } else {
-                                if (ann != null && ann.isTerminating()) {
+                                if (ann != null && ann.terminating()) {
                                     super.printWarning(
                                             "The annotated method is marked as terminating but does not terminate the regular expression. Treating it as non-terminating.",
                                             m,
@@ -360,7 +361,7 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
                 for (String token : tokens) {
                     for (ExecutableElement m : token2Methods.getOrDefault(token, Collections.emptyList())) {
                         final Action ann = m.getAnnotation(Action.class);
-                        if (ann != null && !ann.isTerminating()) {
+                        if (ann != null && !ann.terminating()) {
                             final Character label = token2labels.get(token);
                             assert label != null;
                             for (State s : states) {
@@ -461,7 +462,7 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
 
         if (type == DocGenType.REFERENCE ||
             type == DocGenType.COPY && doc != null && !doc.contains("@return")) {
-            if (e.getAnnotation(Action.class).isTerminating()) {
+            if (e.getAnnotation(Action.class).terminating()) {
                 if (e.getReturnType().getKind() != TypeKind.VOID) {
                     consumer.accept(CodeBlock.of("@return the result of the delegate"));
                 }

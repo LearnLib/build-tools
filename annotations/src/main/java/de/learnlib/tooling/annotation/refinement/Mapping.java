@@ -19,23 +19,23 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * A refinement mapping of (constructor) parameters for the to-be-generated refinement.
+ * A refinement mapping of (constructor) parameters for the generated refinement.
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target({})
 public @interface Mapping {
 
     /**
-     * The type of input parameter that if matched (equality) should be replaced.
+     * The type that if matched (equality after type erasure) should be replaced.
      *
-     * @return the type of input parameter that if matched should be replaced
+     * @return the type to replace
      */
     Class<?> from();
 
     /**
-     * The replacement type for matched parameters.
+     * The replacement type for the matched type.
      *
-     * @return the replacement type for matched parameters
+     * @return the replacement type for the matched type
      */
     Class<?> to();
 

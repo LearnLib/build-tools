@@ -15,16 +15,16 @@
 package de.learnlib.tooling.annotation;
 
 /**
- * An enum describing different generation types for documentation.
+ * An enum that describes different generation types for documentation.
  */
 public enum DocGenType {
     /**
-     * Describes the automatic generation of documentation that simply references existing
-     * methods/constructors/etc.&nbsp; that is being delegated to.
+     * Describes the automatic generation of documentation that simply references existing methods, constructors,
+     * etc.&nbsp; that is delegated to.
      */
     REFERENCE,
     /**
-     * Describes the copying of existing documentation from the existing methods/constructors/etc.&nbsp; that is being
+     * Describes the copying of existing documentation from the existing methods, constructors, etc.&nbsp; that is
      * delegated to.
      */
     COPY,

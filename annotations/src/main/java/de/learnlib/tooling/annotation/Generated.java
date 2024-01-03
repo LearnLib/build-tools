@@ -20,25 +20,24 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Markup annotation that denotes generated files. Note that this annotation has the retention level
- * {@link RetentionPolicy#CLASS} so that analysis tools (such as jacoco) can automatically ignore the generated files
- * without any additional configuration necessary.
+ * Markup annotation that denotes generated files. This annotation has the retention level {@link RetentionPolicy#CLASS}
+ * so that code-analysis tools may ignore the generated classes without any additional configuration necessary.
  */
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.TYPE)
 public @interface Generated {
 
     /**
-     * The the fully qualified name of the code generator.
+     * Denotes the fully qualified name of the code generator.
      *
-     * @return The the fully qualified name of the code generator
+     * @return the fully qualified name of the code generator
      */
-    String[] generator();
+    String generator();
 
     /**
-     * The fully qualified name of the annotated class.
+     * Denotes the fully qualified name of the annotated (or enclosing) class.
      *
-     * @return The fully qualified name of the annotated class
+     * @return the fully qualified name of the annotated (or enclosing) class
      */
     String source();
 }

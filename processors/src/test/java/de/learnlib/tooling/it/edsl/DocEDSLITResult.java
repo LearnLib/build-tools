@@ -36,6 +36,19 @@ public class DocEDSLITResult<SP, A> {
     }
 
     /**
+     *  The return statement does not match the DSL return object, but we forced COPY mode.
+     *
+     *  @param stateId
+     *          the object to identify the state
+     *
+     *  @return the stateId
+     */
+    public DocEDSLITResult<SP, A> withStateProperty(Object stateId) {
+        delegate.withStateProperty(stateId);
+        return getDocEDSLITResult();
+    }
+
+    /**
      *  Returns the final object.
      *
      *  @return the final object

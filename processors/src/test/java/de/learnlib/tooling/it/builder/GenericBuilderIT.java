@@ -15,7 +15,7 @@
 package de.learnlib.tooling.it.builder;
 
 import de.learnlib.tooling.annotation.builder.GenerateBuilder;
-import de.learnlib.tooling.annotation.builder.Option;
+import de.learnlib.tooling.annotation.builder.Param;
 import de.learnlib.tooling.it.refinement.SubInterface;
 import de.learnlib.tooling.it.refinement.SuperInterface;
 
@@ -31,7 +31,7 @@ public class GenericBuilderIT<I, O extends SubInterface<I>> {
 
     @SafeVarargs
     @GenerateBuilder(name = "GenericBuilderITResult")
-    public GenericBuilderIT(int a, I b, SuperInterface<?> c, @Option(requiredOnCreation = true) O... d)
+    public GenericBuilderIT(int a, I b, SuperInterface<?> c, @Param(requiredOnBuild = true) O... d)
             throws Exception {}
 
 }

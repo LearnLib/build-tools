@@ -19,21 +19,21 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Definition of an additional interface.
+ * A definition of an interface.
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target({})
 public @interface Interface {
 
     /**
-     * A reference to the interface.
+     * A reference to the interface class.
      *
-     * @return a reference to the interface
+     * @return a reference to the interface class
      */
     Class<?> clazz();
 
     /**
-     * Potential nested type parameters of the referenced (cf. {@link #clazz()}) interface.
+     * Potential nested type parameters of the {@link #clazz() referenced} interface.
      *
      * @return potential nested type parameters of the referenced interface
      */

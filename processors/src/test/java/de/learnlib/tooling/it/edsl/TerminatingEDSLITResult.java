@@ -80,6 +80,10 @@ public class TerminatingEDSLITResult {
     /**
      * A state (-class) of the enclosing fluent interface.
      */
+    @Generated(
+            generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
+            source = "de.learnlib.tooling.it.edsl.TerminatingEDSLIT"
+    )
     public final class TerminatingEDSLITResult0 {
         private TerminatingEDSLITResult0() {
         }
@@ -97,6 +101,10 @@ public class TerminatingEDSLITResult {
     /**
      * A state (-class) of the enclosing fluent interface.
      */
+    @Generated(
+            generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
+            source = "de.learnlib.tooling.it.edsl.TerminatingEDSLIT"
+    )
     public final class TerminatingEDSLITResult1 {
         private TerminatingEDSLITResult1() {
         }
@@ -105,6 +113,10 @@ public class TerminatingEDSLITResult {
     /**
      * A state (-class) of the enclosing fluent interface.
      */
+    @Generated(
+            generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
+            source = "de.learnlib.tooling.it.edsl.TerminatingEDSLIT"
+    )
     public final class TerminatingEDSLITResult2 {
         private TerminatingEDSLITResult2() {
         }
@@ -122,6 +134,10 @@ public class TerminatingEDSLITResult {
     /**
      * A state (-class) of the enclosing fluent interface.
      */
+    @Generated(
+            generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
+            source = "de.learnlib.tooling.it.edsl.TerminatingEDSLIT"
+    )
     public final class TerminatingEDSLITResult3 {
         private TerminatingEDSLITResult3() {
         }

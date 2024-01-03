@@ -90,6 +90,10 @@ public class OverlappingEDSLITResult {
     /**
      * A state (-class) of the enclosing fluent interface.
      */
+    @Generated(
+            generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
+            source = "de.learnlib.tooling.it.edsl.OverlappingEDSLIT"
+    )
     public final class OverlappingEDSLITResult0 {
         private OverlappingEDSLITResult0() {
         }
@@ -107,6 +111,10 @@ public class OverlappingEDSLITResult {
     /**
      * A state (-class) of the enclosing fluent interface.
      */
+    @Generated(
+            generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
+            source = "de.learnlib.tooling.it.edsl.OverlappingEDSLIT"
+    )
     public final class OverlappingEDSLITResult1 {
         private OverlappingEDSLITResult1() {
         }
@@ -115,6 +123,10 @@ public class OverlappingEDSLITResult {
     /**
      * A state (-class) of the enclosing fluent interface.
      */
+    @Generated(
+            generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
+            source = "de.learnlib.tooling.it.edsl.OverlappingEDSLIT"
+    )
     public final class OverlappingEDSLITResult2 {
         private OverlappingEDSLITResult2() {
         }
@@ -141,6 +153,10 @@ public class OverlappingEDSLITResult {
     /**
      * A state (-class) of the enclosing fluent interface.
      */
+    @Generated(
+            generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
+            source = "de.learnlib.tooling.it.edsl.OverlappingEDSLIT"
+    )
     public final class OverlappingEDSLITResult3 {
         private OverlappingEDSLITResult3() {
         }

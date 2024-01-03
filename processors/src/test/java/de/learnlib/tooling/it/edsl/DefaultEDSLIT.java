@@ -65,7 +65,7 @@ public class DefaultEDSLIT<I, SP, TP, A> {
     @Action
     public void loop() {}
 
-    @Action(isTerminating = true)
+    @Action(terminating = true)
     public A create() {
         return this.a;
     }

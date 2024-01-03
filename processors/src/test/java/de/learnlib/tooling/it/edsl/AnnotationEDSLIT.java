@@ -26,6 +26,6 @@ public @interface AnnotationEDSLIT {
     @Action
     String pong();
 
-    @Action(isTerminating = true)
+    @Action(terminating = true)
     String exit();
 }

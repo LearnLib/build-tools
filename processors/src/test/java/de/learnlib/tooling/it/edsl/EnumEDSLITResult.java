@@ -52,6 +52,10 @@ public class EnumEDSLITResult {
     /**
      * A state (-class) of the enclosing fluent interface.
      */
+    @Generated(
+            generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
+            source = "de.learnlib.tooling.it.edsl.EnumEDSLIT"
+    )
     public final class EnumEDSLITResult0 {
         private EnumEDSLITResult0() {
         }

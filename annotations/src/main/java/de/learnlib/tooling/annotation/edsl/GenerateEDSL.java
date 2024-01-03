@@ -23,61 +23,66 @@ import de.learnlib.tooling.annotation.DocGenType;
 import dk.brics.automaton.RegExp;
 
 /**
- * Generate an (embedded) DSL from the target class, interface, or enum. If an annotated class contains one or multiple
- * {@link Action}-annotated constructors, the (embedded) DSL object can be directly instantiated via the respective
- * constructors parameters.
+ * An annotation to indicate that an (embedded) DSL should be generated from the target class, interface, or enum. If an
+ * annotated class contains one or multiple {@link Action}-annotated constructors, the generated class can be directly
+ * instantiated via the respective constructors parameters.
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
 public @interface GenerateEDSL {
 
     /**
-     * The simple, i.e., unqualified name of the (embedded) DSL class to generate.
+     * The (unqualified) name of the (embedded) DSL class to generate.
      *
-     * @return the (simple) class name
+     * @return the (unqualified) name
      */
     String name();
 
     /**
-     * The fully qualified package name in which the generated (embedded) DSL class will be placed. By default, the same
-     * package as the annotated class will be used.
+     * The fully qualified package name in which the generated class should be placed. By default, the same package as
+     * the annotated class is used.
      *
-     * @return the package name
+     * @return the fully qualified package name
      */
-    String packageName() default "";
+    String packageName() default ".";
 
     /**
-     * The syntax of the (embedded) DSL, specified as a regular expression. The expression will be parsed by
-     * {@link RegExp} (with {@link RegExp#COMPLEMENT} and {@link RegExp#INTERSECTION} enabled) and therefore follow
-     * {@link RegExp}s syntax and precedence rules. {@link Expr (Sub-) expressions} in the form of
-     * "&lt;{@link Expr#name() name}&gt;" are allowed and will be {@link String#replaceAll(String, String) replaced}
-     * prior to parsing.
+     * The syntax of the (embedded) DSL, specified as a regular expression. The expression is parsed by {@link RegExp}
+     * (with {@link RegExp#COMPLEMENT} and {@link RegExp#INTERSECTION} enabled) and therefore follow {@link RegExp}s
+     * syntax and precedence rules. {@link Expr (Sub-) expressions} in the form of "&lt;{@link Expr#name() name}&gt;"
+     * are allowed and are {@link String#replaceAll(String, String) replaced} prior to parsing.
      *
      * @return the syntax expression
      */
     String syntax();
 
     /**
-     * A flag indicating whether the generated class should be {@code public}.
-     *
-     * @return whether the generated class should be {@code public}
-     */
-    boolean classPublic() default true;
-
-    /**
-     * A flag indicating whether the constructor of the generated class should be {@code public}.
-     *
-     * @return whether the constructor(s) of the generated class should be {@code public}
-     */
-    boolean constructorPublic() default true;
-
-    /**
-     * Returns the named expressions that can be used in the embedded DSL syntax definition. Expressions are substituted
-     * in-order, should you need nested expressions.
+     * Returns the named expressions that can be used in the (embedded) DSL syntax definition. Expressions are
+     * substituted in-order, should nested expressions be needed.
      *
      * @return the named expressions referenced in the syntax definition
      */
     Expr[] where() default {};
 
+    /**
+     * Specifies whether the generated class should be public. If {@code false}, a package-private class is generated.
+     *
+     * @return whether the generated class should be public
+     */
+    boolean classPublic() default true;
+
+    /**
+     * Specifies whether the constructor of the generated class should be public. If {@code false}, a package-private
+     * constructor is generated.
+     *
+     * @return whether the constructor of the generated class should be public
+     */
+    boolean constructorPublic() default true;
+
+    /**
+     * Specifies how the documentation of the generated class should be constructed.
+     *
+     * @return the generation type for the documentation
+     */
     DocGenType docGenType() default DocGenType.REFERENCE;
 }

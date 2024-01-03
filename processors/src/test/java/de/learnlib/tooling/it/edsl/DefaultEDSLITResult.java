@@ -92,6 +92,10 @@ public class DefaultEDSLITResult<I, SP, TP, A> {
     /**
      * A state (-class) of the enclosing fluent interface.
      */
+    @Generated(
+            generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
+            source = "de.learnlib.tooling.it.edsl.DefaultEDSLIT"
+    )
     public final class DefaultEDSLITResult0 {
         private DefaultEDSLITResult0() {
         }
@@ -123,6 +127,10 @@ public class DefaultEDSLITResult<I, SP, TP, A> {
     /**
      * A state (-class) of the enclosing fluent interface.
      */
+    @Generated(
+            generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
+            source = "de.learnlib.tooling.it.edsl.DefaultEDSLIT"
+    )
     public final class DefaultEDSLITResult1 {
         private DefaultEDSLITResult1() {
         }

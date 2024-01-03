@@ -28,6 +28,6 @@ public enum EnumEDSLIT {
     @Action
     void pong() {}
 
-    @Action(isTerminating = true)
+    @Action(terminating = true)
     void exit() {}
 }

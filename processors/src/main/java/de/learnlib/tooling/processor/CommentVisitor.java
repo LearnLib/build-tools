@@ -21,11 +21,11 @@ import com.squareup.javapoet.CodeBlock;
 import com.sun.source.doctree.DocCommentTree;
 import com.sun.source.util.DocTreeScanner;
 
-public class DocCommentVisitor extends DocTreeScanner<Void, Void> {
+public class CommentVisitor extends DocTreeScanner<Void, Void> {
 
     private final Consumer<CodeBlock> consumer;
 
-    public DocCommentVisitor(Consumer<CodeBlock> consumer) {
+    public CommentVisitor(Consumer<CodeBlock> consumer) {
         this.consumer = consumer;
     }
 

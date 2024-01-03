@@ -31,7 +31,7 @@ public class OverlappingEDSLIT {
         return aa("aa");
     }
 
-    @Action(isTerminating = true)
+    @Action(terminating = true)
     public String aa(String arg) {
         return arg;
     }

@@ -22,8 +22,8 @@ import de.learnlib.tooling.annotation.refinement.Mapping;
 @GenerateRefinement(name = "SingleRefinementITResult",
                     generics = @Generic("M"),
                     parentGenerics = {@Generic("M"), @Generic(clazz = Boolean.class)},
-                    typeMapping = {@Mapping(from = SuperInterface.class, to = SubInterface.class, generics = @Generic("M")),
-                                   @Mapping(from = SuperInterface2.class,
+                    typeMappings = {@Mapping(from = SuperInterface.class, to = SubInterface.class, generics = @Generic("M")),
+                                    @Mapping(from = SuperInterface2.class,
                                             to = SubInterface2.class,
                                             generics = @Generic(clazz = Boolean.class))},
                     interfaces = @Interface(clazz = SubInterface.class, generics = @Generic(clazz = Boolean.class)))

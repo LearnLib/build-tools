@@ -20,7 +20,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Markup annotation to automatically generate a builder for the annotated constructor.
+ * An annotation to indicate that a builder for the annotated constructor should be generated.
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.CONSTRUCTOR)
@@ -32,20 +32,20 @@ public @interface GenerateBuilder {
     String SUPPRESS = "-";
 
     /**
-     * The name of the generated builder. If left empty, it will be automatically constructed from the class name of the
-     * annotated constructor + "Builder".
+     * The (unqualified) name of the generated builder. By default, the name is automatically constructed from the class
+     * name of the annotated constructor + "Builder".
      *
      * @return the name of the generated builder
      */
     String name() default "";
 
     /**
-     * The package name of the generated builder. If left empty, it will be automatically constructed from the package
-     * name of the class of the annotated constructor.
+     * The package name of the generated builder. By default, the package name is copied from the enclosing class of the
+     * annotated constructor. name of the class of the annotated constructor.
      *
      * @return the package of the generated builder
      */
-    String packageName() default "";
+    String packageName() default ".";
 
     /**
      * The prefix to use for getter methods. Use {@link #SUPPRESS} to disable generating getters.
@@ -69,26 +69,13 @@ public @interface GenerateBuilder {
     String withPrefix() default "with";
 
     /**
-     * The class containing the default values for the options. If {@link Void} is specified, no default values are
-     * used.
+     * The class containing the default values for the parameters. In order to provide a default value for a parameter,
+     * the specified class must declare a static method without parameters whose name matches the corresponding
+     * parameter name. By default, no default values are used.
      *
-     * @return the class containing the default values for the options
+     * @return the class containing the default values for the parameters
      */
     Class<?> defaults() default Void.class;
-
-    /**
-     * A flag indicating whether the generated class should be {@code public}.
-     *
-     * @return whether the generated class should be {@code public}
-     */
-    boolean classPublic() default true;
-
-    /**
-     * A flag indicating whether the constructor of the generated class should be {@code public}.
-     *
-     * @return whether the constructor(s) of the generated class should be {@code public}
-     */
-    boolean constructorPublic() default true;
 
     /**
      * The name for the create method.
@@ -96,4 +83,19 @@ public @interface GenerateBuilder {
      * @return the name for the create method
      */
     String createName() default "create";
+
+    /**
+     * Specifies whether the generated class should be public. If {@code false}, a package-private class is generated.
+     *
+     * @return whether the generated class should be public
+     */
+    boolean classPublic() default true;
+
+    /**
+     * Specifies whether the constructor of the generated class should be public. If {@code false}, a package-private
+     * constructor is generated.
+     *
+     * @return whether the constructor of the generated class should be public
+     */
+    boolean constructorPublic() default true;
 }

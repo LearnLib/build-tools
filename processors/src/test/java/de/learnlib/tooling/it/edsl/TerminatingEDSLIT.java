@@ -29,7 +29,7 @@ public class TerminatingEDSLIT {
     @Action
     public void aa() {}
 
-    @Action(isTerminating = true)
+    @Action(terminating = true)
     public String aaa() {
         return "aaa";
     }

@@ -19,20 +19,25 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Definition of a generic parameter.
+ * A definition of a generic type parameter.
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target({})
 public @interface Generic {
 
     /**
-     * A literal representation of a type parameter (e.g. defined in {@link GenerateRefinement#generics()}). A non-empty
-     * value has a higher precedence over any {@link #clazz()} parameter.
+     * The literal representation of a type parameter. A non-empty value has a higher precedence over any
+     * {@link #clazz()} parameter.
      *
      * @return a literal representation of a type parameter
      */
     String value() default "";
 
+    /**
+     * The description of a type parameter. Might be used in the generation of documentation.
+     *
+     * @return the description of a type parameter
+     */
     String desc() default "";
 
     /**

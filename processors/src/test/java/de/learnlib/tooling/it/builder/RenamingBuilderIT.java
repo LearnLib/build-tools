@@ -15,15 +15,15 @@
 package de.learnlib.tooling.it.builder;
 
 import de.learnlib.tooling.annotation.builder.GenerateBuilder;
-import de.learnlib.tooling.annotation.builder.Option;
+import de.learnlib.tooling.annotation.builder.Param;
 import de.learnlib.tooling.it.refinement.SuperInterface;
 
 public class RenamingBuilderIT {
 
     @GenerateBuilder(name = "RenamedBuilderITResult", withPrefix = "without", getterPrefix = "git", setterPrefix = "sit")
-    public RenamingBuilderIT(@Option(name = "param1") int a,
+    public RenamingBuilderIT(@Param(name = "param1") int a,
                              String b,
-                             @Option(getterName = "ccc", setterName = "ccc") SuperInterface<?> c,
-                             @Option(withName = "DD") Object[] d) {}
+                             @Param(getterName = "ccc", setterName = "ccc") SuperInterface<?> c,
+                             @Param(withName = "DD") Object[] d) {}
 
 }

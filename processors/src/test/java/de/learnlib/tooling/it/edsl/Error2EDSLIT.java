@@ -29,7 +29,7 @@ public class Error2EDSLIT<I, SP, TP, A> {
     @Action
     public void action() {}
 
-    @Action(isTerminating = true)
+    @Action(terminating = true)
     public void create() {}
 
 }

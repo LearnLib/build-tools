@@ -27,12 +27,12 @@ import java.lang.annotation.Target;
 public @interface Action {
 
     /**
-     * A flag indicating that a {@link Action} is a terminating action and therefore should return the value of the
-     * actual annotated method.
+     * Specifies whether an {@link Action} is a terminating action and therefore should return the value of the actual
+     * annotated method.
      *
      * @return {@code true} if the action is terminating, {@code false} otherwise
      */
-    boolean isTerminating() default false;
+    boolean terminating() default false;
 
 }
 

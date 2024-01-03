@@ -23,9 +23,10 @@ import java.lang.annotation.Target;
 import de.learnlib.tooling.annotation.DocGenType;
 
 /**
- * Annotation to indicate that a subclass with the specified configuration should be generated. Currently only supports
- * classes and the modification of type parameters, constructor parameters, and implemented interfaces. The generated
- * classes have a matching constructor for each parent constrictor (if possible).
+ * An annotation to indicate that a subclass with the specified configuration should be generated. Currently only
+ * supports classes and the modification of type parameters, constructor parameters, and implemented interfaces. The
+ * generated classes have a matching constructors for each parent constructor if possible, i.e., private constructors
+ * are ignored.
  */
 @Repeatable(GenerateRefinements.class)
 @Retention(RetentionPolicy.SOURCE)
@@ -33,22 +34,23 @@ import de.learnlib.tooling.annotation.DocGenType;
 public @interface GenerateRefinement {
 
     /**
-     * The name of the to-be-generated refinement.
+     * The (unqualified) name of the refinement to generate.
      *
-     * @return the name of the to-be-generated refinement
+     * @return the (unqualified) name
      */
     String name();
 
     /**
-     * The package name of the generated refinement. If left empty, it will be automatically constructed from the
-     * package name of the annotated class.
+     * The fully qualified package name in which the generated class should be placed. By default, the same package as
+     * the annotated class is used.
      *
-     * @return the package of the generated builder
+     * @return the fully qualified package name
      */
-    String packageName() default "";
+    String packageName() default ".";
 
     /**
-     * The type variables the refinement should have.
+     * The type variables the refinement should have. The {@link Generic#desc()} may be used to provide additional
+     * information for the generation of documentation.
      *
      * @return the type variables the refinement should have
      */
@@ -62,38 +64,38 @@ public @interface GenerateRefinement {
     Generic[] parentGenerics() default {};
 
     /**
-     * A mapping of specializations of parameter types for the refinement's constructor parameters.
+     * Mappings of type specializations for the refinement's constructor parameters.
      *
-     * @return a mapping of specializations of parameter types for the refinement's constructor parameters
+     * @return mappings of type specializations for the refinement's constructor parameters
      */
-    Mapping[] typeMapping() default {};
+    Mapping[] typeMappings() default {};
 
     /**
-     * An array of additional interfaces the refinement should implement.
+     * Additional interfaces that the refinement should implement.
      *
-     * @return an array of additional interfaces the refinement should implement
+     * @return additional interfaces that the refinement should implement
      */
     Interface[] interfaces() default {};
 
     /**
-     * A flag indicating whether the generated class should be {@code public}.
+     * Specifies whether the generated class should be public. If {@code false}, a package-private class is generated.
      *
-     * @return whether the generated class should be {@code public}
+     * @return whether the generated class should be public
      */
     boolean classPublic() default true;
 
     /**
-     * A flag indicating whether the constructor of the generated class should be {@code public}.
+     * Specifies whether the constructor of the generated class should be public. If {@code false}, a package-private
+     * constructor is generated.
      *
-     * @return whether the constructor(s) of the generated class should be {@code public}
+     * @return whether the constructor of the generated class should be public
      */
     boolean constructorPublic() default true;
 
     /**
-     * A flag indicating whether the JavaDoc of the parent class' constructors should be copied (as-is) to the
-     * refinement's constructors.
+     * Specifies how the documentation of the generated class should be constructed.
      *
-     * @return {@code true} if the JavaDoc of the constructors should be copied, {@code false} otherwise
+     * @return the generation type for the documentation
      */
     DocGenType docGenType() default DocGenType.REFERENCE;
 

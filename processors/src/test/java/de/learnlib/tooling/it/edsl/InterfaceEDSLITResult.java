@@ -52,6 +52,10 @@ public class InterfaceEDSLITResult {
     /**
      * A state (-class) of the enclosing fluent interface.
      */
+    @Generated(
+            generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
+            source = "de.learnlib.tooling.it.edsl.InterfaceEDSLIT"
+    )
     public final class InterfaceEDSLITResult0 {
         private InterfaceEDSLITResult0() {
         }

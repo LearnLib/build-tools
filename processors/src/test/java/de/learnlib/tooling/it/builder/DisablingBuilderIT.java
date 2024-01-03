@@ -15,7 +15,7 @@
 package de.learnlib.tooling.it.builder;
 
 import de.learnlib.tooling.annotation.builder.GenerateBuilder;
-import de.learnlib.tooling.annotation.builder.Option;
+import de.learnlib.tooling.annotation.builder.Param;
 import de.learnlib.tooling.it.refinement.SuperInterface;
 
 public class DisablingBuilderIT {
@@ -23,12 +23,12 @@ public class DisablingBuilderIT {
     @GenerateBuilder(name = "DisablingBuilderITResult",
                      defaults = Defaults.class,
                      setterPrefix = GenerateBuilder.SUPPRESS)
-    public DisablingBuilderIT(@Option(name = GenerateBuilder.SUPPRESS, requiredOnInstantiation = true) int a,
-                              @Option(withName = GenerateBuilder.SUPPRESS) String b,
+    public DisablingBuilderIT(@Param(name = GenerateBuilder.SUPPRESS, requiredOnInstantiation = true) int a,
+                              @Param(withName = GenerateBuilder.SUPPRESS) String b,
                               SuperInterface<?> c,
-                              @Option(getterName = GenerateBuilder.SUPPRESS,
-                                      withName = GenerateBuilder.SUPPRESS,
-                                      requiredOnCreation = true) Object... d) {}
+                              @Param(getterName = GenerateBuilder.SUPPRESS,
+                                     withName = GenerateBuilder.SUPPRESS,
+                                     requiredOnBuild = true) Object... d) {}
 
     public static class Defaults {
 

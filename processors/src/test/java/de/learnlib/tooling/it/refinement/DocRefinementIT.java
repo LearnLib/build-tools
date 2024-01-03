@@ -34,9 +34,9 @@ import de.learnlib.tooling.annotation.refinement.Mapping;
 @GenerateRefinement(name = "DocRefinementIT1Result",
                     generics = @Generic(value = "O", desc = "output symbol type"),
                     parentGenerics = {@Generic(clazz = String.class), @Generic("O")},
-                    typeMapping = {@Mapping(from = SuperInterface.class,
-                                            to = SubInterface.class,
-                                            generics = @Generic("O"))},
+                    typeMappings = {@Mapping(from = SuperInterface.class,
+                                             to = SubInterface.class,
+                                             generics = @Generic("O"))},
                     docGenType = DocGenType.COPY)
 @GenerateRefinement(name = "DocRefinementIT2Result",
                     parentGenerics = {@Generic(clazz = String.class), @Generic(clazz = Boolean.class)})

@@ -43,7 +43,7 @@ import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 import com.sun.source.doctree.DocCommentTree;
 import de.learnlib.tooling.annotation.builder.GenerateBuilder;
-import de.learnlib.tooling.annotation.builder.Option;
+import de.learnlib.tooling.annotation.builder.Param;
 import de.learnlib.tooling.processor.AbstractLearnLibProcessor;
 import de.learnlib.tooling.processor.ParamVisitor;
 
@@ -104,7 +104,7 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
             for (int i = 0; i < params.size(); i++) {
                 final VariableElement ve = params.get(i);
                 final boolean isVarArgs = constructor.isVarArgs() && i == params.size() - 1;
-                final Option paramAnnotation = ve.getAnnotation(Option.class);
+                final Param paramAnnotation = ve.getAnnotation(Param.class);
                 final boolean isFieldSuppressed;
                 final String fieldName;
 
@@ -213,7 +213,7 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
                 }
 
                 // create
-                if (paramAnnotation != null && paramAnnotation.requiredOnCreation()) {
+                if (paramAnnotation != null && paramAnnotation.requiredOnBuild()) {
                     createBuilder.varargs(isVarArgs)
                                  .addParameter(fieldTypeName, fieldName)
                                  .addJavadoc("@param $N the value used for the parameter {@code $N}\n",

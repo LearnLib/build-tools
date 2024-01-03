@@ -47,11 +47,24 @@ public class DocEDSLIT<SP, A> {
     public void withStateProperty(SP stateProperty, Object stateId) {}
 
     /**
+     * The return statement does not match the DSL return object, but we forced COPY mode.
+     *
+     * @param stateId
+     *         the object to identify the state
+     *
+     * @return the stateId
+     */
+    @Action
+    public Object withStateProperty(Object stateId) {
+        return stateId;
+    }
+
+    /**
      * Returns the final object.
      *
      * @return the final object
      */
-    @Action(isTerminating = true)
+    @Action(terminating = true)
     public A create() {
         return null;
     }

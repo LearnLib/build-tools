@@ -164,10 +164,10 @@ public abstract class AbstractLearnLibProcessor extends AbstractProcessor {
     }
 
     protected String getPackageName(Element element, String defaultValue) {
-        if (defaultValue != null && !defaultValue.isEmpty()) {
-            return defaultValue;
-        } else {
+        if (defaultValue == null || ".".equals(defaultValue)) {
             return super.processingEnv.getElementUtils().getPackageOf(element).getQualifiedName().toString();
+        } else {
+            return defaultValue;
         }
     }
 

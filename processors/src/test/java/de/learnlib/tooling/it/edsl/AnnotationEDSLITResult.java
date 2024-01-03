@@ -54,6 +54,10 @@ public class AnnotationEDSLITResult {
     /**
      * A state (-class) of the enclosing fluent interface.
      */
+    @Generated(
+            generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
+            source = "de.learnlib.tooling.it.edsl.AnnotationEDSLIT"
+    )
     public final class AnnotationEDSLITResult0 {
         private AnnotationEDSLITResult0() {
         }

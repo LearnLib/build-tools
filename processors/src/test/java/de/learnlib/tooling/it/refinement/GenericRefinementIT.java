@@ -23,10 +23,10 @@ import de.learnlib.tooling.annotation.refinement.Mapping;
 
 @GenerateRefinement(name = "GenericRefinementITResult",
                     parentGenerics = {@Generic(clazz = String.class), @Generic(clazz = Boolean.class)},
-                    typeMapping = {@Mapping(from = SuperInterface.class,
-                                            to = SubInterface.class,
-                                            generics = @Generic(clazz = String.class)),
-                                   @Mapping(from = SubInterface.class,
+                    typeMappings = {@Mapping(from = SuperInterface.class,
+                                             to = SubInterface.class,
+                                             generics = @Generic(clazz = String.class)),
+                                    @Mapping(from = SubInterface.class,
                                             to = SuperInterface.class,
                                             generics = @Generic(clazz = String.class))})
 public class GenericRefinementIT<I, O> {

@@ -136,6 +136,10 @@ public class ExtendingEDSLITResult<I, A extends SuperInterface<?>> {
     /**
      * A state (-class) of the enclosing fluent interface.
      */
+    @Generated(
+            generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
+            source = "de.learnlib.tooling.it.edsl.ExtendingEDSLIT"
+    )
     public final class ExtendingEDSLITResult0 {
         private ExtendingEDSLITResult0() {
         }
@@ -183,6 +187,10 @@ public class ExtendingEDSLITResult<I, A extends SuperInterface<?>> {
     /**
      * A state (-class) of the enclosing fluent interface.
      */
+    @Generated(
+            generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
+            source = "de.learnlib.tooling.it.edsl.ExtendingEDSLIT"
+    )
     public final class ExtendingEDSLITResult1 {
         private ExtendingEDSLITResult1() {
         }
@@ -214,6 +222,10 @@ public class ExtendingEDSLITResult<I, A extends SuperInterface<?>> {
     /**
      * A state (-class) of the enclosing fluent interface.
      */
+    @Generated(
+            generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
+            source = "de.learnlib.tooling.it.edsl.ExtendingEDSLIT"
+    )
     public final class ExtendingEDSLITResult2 {
         private ExtendingEDSLITResult2() {
         }
@@ -245,6 +257,10 @@ public class ExtendingEDSLITResult<I, A extends SuperInterface<?>> {
     /**
      * A state (-class) of the enclosing fluent interface.
      */
+    @Generated(
+            generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
+            source = "de.learnlib.tooling.it.edsl.ExtendingEDSLIT"
+    )
     public final class ExtendingEDSLITResult3 {
         private ExtendingEDSLITResult3() {
         }
@@ -272,6 +288,10 @@ public class ExtendingEDSLITResult<I, A extends SuperInterface<?>> {
     /**
      * A state (-class) of the enclosing fluent interface.
      */
+    @Generated(
+            generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
+            source = "de.learnlib.tooling.it.edsl.ExtendingEDSLIT"
+    )
     public final class ExtendingEDSLITResult4 {
         private ExtendingEDSLITResult4() {
         }
@@ -299,6 +319,10 @@ public class ExtendingEDSLITResult<I, A extends SuperInterface<?>> {
     /**
      * A state (-class) of the enclosing fluent interface.
      */
+    @Generated(
+            generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
+            source = "de.learnlib.tooling.it.edsl.ExtendingEDSLIT"
+    )
     public final class ExtendingEDSLITResult5 {
         private ExtendingEDSLITResult5() {
         }
@@ -371,6 +395,10 @@ public class ExtendingEDSLITResult<I, A extends SuperInterface<?>> {
     /**
      * A state (-class) of the enclosing fluent interface.
      */
+    @Generated(
+            generator = "de.learnlib.tooling.processor.edsl.EDSLProcessor",
+            source = "de.learnlib.tooling.it.edsl.ExtendingEDSLIT"
+    )
     public final class ExtendingEDSLITResult6 {
         private ExtendingEDSLITResult6() {
         }

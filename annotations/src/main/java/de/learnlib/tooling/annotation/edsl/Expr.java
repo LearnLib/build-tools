@@ -26,16 +26,16 @@ import java.lang.annotation.Target;
 public @interface Expr {
 
     /**
-     * Returns the name of this expression.
+     * The name of this expression.
      *
      * @return the name of this expression
      */
     String name();
 
     /**
-     * Returns the syntax definition of this expression. The syntax follows that of {@link GenerateEDSL#syntax()}.
+     * The syntax definition of this expression. The syntax follows that of {@link GenerateEDSL#syntax()}.
      *
-     * @return the syntax of this expression
+     * @return the syntax definition of this expression
      */
     String syntax();
 

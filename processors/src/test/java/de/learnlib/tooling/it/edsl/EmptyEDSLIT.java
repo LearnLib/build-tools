@@ -21,7 +21,7 @@ import de.learnlib.tooling.annotation.edsl.GenerateEDSL;
 @GenerateEDSL(name = "EmptyEDSLITResult", syntax = "done", docGenType = DocGenType.NONE)
 public class EmptyEDSLIT {
 
-    @Action(isTerminating = true)
+    @Action(terminating = true)
     public String done() {
         return "done";
     }
