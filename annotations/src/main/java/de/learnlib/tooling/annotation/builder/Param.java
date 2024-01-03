@@ -68,9 +68,9 @@ public @interface Param {
 
     /**
      * Specifies whether this parameter is required when creating the object instance, i.e., a parameter of the
-     * {@link GenerateBuilder#createName() build} method of the builder.
+     * {@link GenerateBuilder#createName() create} method of the builder.
      *
-     * @return a flag indicating, whether or not this parameter is required when creating the object instance
+     * @return whether this parameter is required when creating the object instance
      */
-    boolean requiredOnBuild() default false;
+    boolean requiredOnCreation() default false;
 }

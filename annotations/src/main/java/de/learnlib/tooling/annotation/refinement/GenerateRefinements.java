@@ -27,6 +27,11 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface GenerateRefinements {
 
+    /**
+     * The {@link GenerateRefinement} annotations to consider.
+     *
+     * @return the annotations to consider
+     */
     GenerateRefinement[] value() default {};
 
 }

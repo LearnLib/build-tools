@@ -33,9 +33,9 @@ public @interface Interface {
     Class<?> clazz();
 
     /**
-     * Potential nested type parameters of the {@link #clazz() referenced} interface.
+     * Potential nested type parameters of the {@link #clazz() referenced} interface class.
      *
-     * @return potential nested type parameters of the referenced interface
+     * @return potential nested type parameters of the referenced interface class
      */
     Generic[] generics() default {};
 

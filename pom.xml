@@ -85,11 +85,10 @@ limitations under the License.
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.release>8</maven.compiler.release>
-        <argLine/> <!-- compatibility for property expansion in surefire-plugin -->
 
         <!-- plugin versions -->
         <checkstyle-plugin.version>3.3.0</checkstyle-plugin.version>
-        <compiler-plugin.version>3.10.1</compiler-plugin.version>
+        <compiler-plugin.version>3.11.0</compiler-plugin.version>
         <dependency-plugin.version>3.6.0</dependency-plugin.version>
         <deploy-plugin.version>3.1.1</deploy-plugin.version>
         <enforcer-plugin.version>3.4.1</enforcer-plugin.version>
@@ -192,14 +191,6 @@ limitations under the License.
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
                     <version>${dependency-plugin.version}</version>
-                    <!--
-                     TODO: Remove once the plugin no longer throws false-positives. Apparently the problem has been
-                           fixed (https://issues.apache.org/jira/projects/MDEP/issues/MDEP-757) but we still run into
-                           this issue.
-                    -->
-                    <configuration>
-                        <ignoreAllNonTestScoped>true</ignoreAllNonTestScoped>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -210,43 +201,16 @@ limitations under the License.
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${compiler-plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <id>default-compile</id>
-                            <configuration>
-                                <proc>none</proc>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>default-testCompile</id>
-                            <configuration>
-                                <proc>none</proc>
-                            </configuration>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${surefire-plugin.version}</version>
-                    <configuration>
-                        <systemPropertyVariables>
-                            <!-- required by our class-2-resource translator -->
-                            <testSourceDir>${project.build.testSourceDirectory}</testSourceDir>
-                        </systemPropertyVariables>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>${jar-plugin.version}</version>
-                    <configuration>
-                        <archive>
-                            <manifestEntries>
-                                <Automatic-Module-Name>de.learnlib.tooling.annotation_processor</Automatic-Module-Name>
-                            </manifestEntries>
-                        </archive>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -365,8 +329,6 @@ limitations under the License.
                                 </goals>
                                 <configuration>
                                     <failOnWarning>true</failOnWarning>
-                                    <!-- workaround for APT / slf4j test dependencies -->
-                                    <ignoreNonCompile>true</ignoreNonCompile>
                                 </configuration>
                             </execution>
                         </executions>

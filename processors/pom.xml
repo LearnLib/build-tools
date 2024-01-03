@@ -36,13 +36,13 @@ limitations under the License.
 
     <dependencies>
         <dependency>
-            <groupId>de.learnlib.tooling</groupId>
-            <artifactId>annotations</artifactId>
+            <groupId>com.squareup</groupId>
+            <artifactId>javapoet</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>com.squareup</groupId>
-            <artifactId>javapoet</artifactId>
+            <groupId>de.learnlib.tooling</groupId>
+            <artifactId>annotations</artifactId>
         </dependency>
 
         <dependency>
@@ -71,6 +71,13 @@ limitations under the License.
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <proc>none</proc>
+                    </configuration>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>

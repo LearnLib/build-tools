@@ -213,7 +213,7 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
                 }
 
                 // create
-                if (paramAnnotation != null && paramAnnotation.requiredOnBuild()) {
+                if (paramAnnotation != null && paramAnnotation.requiredOnCreation()) {
                     createBuilder.varargs(isVarArgs)
                                  .addParameter(fieldTypeName, fieldName)
                                  .addJavadoc("@param $N the value used for the parameter {@code $N}\n",

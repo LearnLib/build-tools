@@ -19,7 +19,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * A refinement mapping of (constructor) parameters for the generated refinement.
+ * A refinement mapping of type parameters for the generated refinement.
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target({})

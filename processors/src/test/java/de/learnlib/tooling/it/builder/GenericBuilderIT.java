@@ -31,7 +31,7 @@ public class GenericBuilderIT<I, O extends SubInterface<I>> {
 
     @SafeVarargs
     @GenerateBuilder(name = "GenericBuilderITResult")
-    public GenericBuilderIT(int a, I b, SuperInterface<?> c, @Param(requiredOnBuild = true) O... d)
+    public GenericBuilderIT(int a, I b, SuperInterface<?> c, @Param(requiredOnCreation = true) O... d)
             throws Exception {}
 
 }

@@ -34,7 +34,7 @@ public @interface Generic {
     String value() default "";
 
     /**
-     * The description of a type parameter. Might be used in the generation of documentation.
+     * The description of a type parameter. May be used for the generation of documentation.
      *
      * @return the description of a type parameter
      */

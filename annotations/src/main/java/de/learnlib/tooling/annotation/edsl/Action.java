@@ -30,7 +30,7 @@ public @interface Action {
      * Specifies whether an {@link Action} is a terminating action and therefore should return the value of the actual
      * annotated method.
      *
-     * @return {@code true} if the action is terminating, {@code false} otherwise
+     * @return whether the action is terminating
      */
     boolean terminating() default false;
 

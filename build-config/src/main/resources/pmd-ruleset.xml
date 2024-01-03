@@ -14,12 +14,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<ruleset name="AutomataLib PMD rules"
+<ruleset name="Build Tools PMD rules"
          xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
 
-    <description>AutomataLib PMD ruleset</description>
+    <description>Build Tools PMD ruleset</description>
 
     <rule ref="category/java/bestpractices.xml">
         <exclude name="AccessorMethodGeneration"/>

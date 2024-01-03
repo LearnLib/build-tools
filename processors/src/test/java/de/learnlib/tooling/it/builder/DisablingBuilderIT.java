@@ -28,7 +28,7 @@ public class DisablingBuilderIT {
                               SuperInterface<?> c,
                               @Param(getterName = GenerateBuilder.SUPPRESS,
                                      withName = GenerateBuilder.SUPPRESS,
-                                     requiredOnBuild = true) Object... d) {}
+                                     requiredOnCreation = true) Object... d) {}
 
     public static class Defaults {
 
