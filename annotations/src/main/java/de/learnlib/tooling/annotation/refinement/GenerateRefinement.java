@@ -93,9 +93,10 @@ public @interface GenerateRefinement {
     boolean constructorPublic() default true;
 
     /**
-     * Specifies how the documentation of the generated class should be constructed. Only concerns the documentation of
-     * constructors. For the class doc (especially the documentation of type variables) also see
-     * {@link Generic#desc()}.
+     * Specifies how the documentation of the generated class should be constructed. In case of {@link DocGenType#COPY},
+     * the constructor documentation is copied as-is, but for the class documentation only the main documentation
+     * (without any tags) is considered. You may use {@link Generic#desc()} to provide additional documentation for the
+     * {@link #generics() specified type parameters}.
      *
      * @return the generation type for the documentation
      */
