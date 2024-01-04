@@ -164,7 +164,7 @@ public abstract class AbstractLearnLibProcessor extends AbstractProcessor {
     }
 
     protected String getPackageName(Element element, String defaultValue) {
-        if (defaultValue == null || ".".equals(defaultValue)) {
+        if (".".equals(defaultValue)) {
             return super.processingEnv.getElementUtils().getPackageOf(element).getQualifiedName().toString();
         } else {
             return defaultValue;

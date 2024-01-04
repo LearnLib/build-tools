@@ -17,7 +17,7 @@ public final class EmptyBuilderITBuilder {
     }
 
     /**
-     * Creates the {@link EmptyBuilderIT} instance with the configured parameters.
+     * Creates a new {@link EmptyBuilderIT} instance with the configured parameters.
      * @return the created instance
      */
     public EmptyBuilderIT create() {

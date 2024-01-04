@@ -47,7 +47,7 @@ final class PackagePrivateBuilderITBuilder {
     }
 
     /**
-     * Creates the {@link PackagePrivateBuilderIT} instance with the configured parameters.
+     * Creates a new {@link PackagePrivateBuilderIT} instance with the configured parameters.
      * @return the created instance
      */
     PackagePrivateBuilderIT create() {

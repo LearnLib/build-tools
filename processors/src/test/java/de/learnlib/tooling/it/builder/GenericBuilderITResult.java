@@ -9,6 +9,8 @@ import java.lang.SafeVarargs;
 /**
  * A builder for constructing {@link GenericBuilderIT} instances.
  * @param <I> input type
+ *          whose description spans over multiple
+ *          lines
  * @param <O> output type
  */
 @Generated(
@@ -137,7 +139,7 @@ public final class GenericBuilderITResult<I, O extends SubInterface<I>> {
     }
 
     /**
-     * Creates the {@link GenericBuilderIT} instance with the configured parameters.
+     * Creates a new {@link GenericBuilderIT} instance with the configured parameters.
      * @param d the value used for the parameter {@code d}
      * @return the created instance
      * @throws Exception if instantiating the object throws this exception

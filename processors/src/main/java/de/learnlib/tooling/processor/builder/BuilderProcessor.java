@@ -95,7 +95,7 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
                                                                .addModifiers(classModifiers)
                                                                .returns(targetType)
                                                                .addJavadoc(
-                                                                       "Creates the {@link $T} instance with the configured parameters.\n",
+                                                                       "Creates a new {@link $T} instance with the configured parameters.\n",
                                                                        super.typeUtils.erasure(clazz.asType()));
 
             final List<? extends VariableElement> params = constructor.getParameters();
@@ -267,7 +267,7 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
     private String getBuilderName(Element element, GenerateBuilder annotation) {
         final String name = annotation.name();
 
-        if (name == null || name.isEmpty()) {
+        if (name.isEmpty()) {
             return element.getEnclosingElement().getSimpleName().toString() + "Builder";
         } else {
             return name;

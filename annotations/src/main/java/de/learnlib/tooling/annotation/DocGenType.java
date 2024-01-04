@@ -15,7 +15,7 @@
 package de.learnlib.tooling.annotation;
 
 /**
- * An enum that describes different generation types for documentation.
+ * An enum that describes different types of generation of documentation.
  */
 public enum DocGenType {
     /**

@@ -24,6 +24,8 @@ import de.learnlib.tooling.it.refinement.SuperInterface;
  *
  * @param <I>
  *         input type
+ *         whose description spans over multiple
+ *         lines
  * @param <O>
  *         output type
  */

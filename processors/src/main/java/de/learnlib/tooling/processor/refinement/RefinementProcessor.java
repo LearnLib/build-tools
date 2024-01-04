@@ -265,11 +265,11 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
                 }
 
                 final String value = generic.value();
-                if (value != null && !value.isEmpty()) {
-                    return TypeVariableName.get(value);
-                } else {
+                if (value.isEmpty()) {
                     return toTypeName(super.getClassValue(generic, Generic::clazz),
                                       toTypeVariableNames(generic.generics()));
+                } else {
+                    return TypeVariableName.get(value);
                 }
             case DECLARED:
                 for (Mapping mapping : typeMapping) {

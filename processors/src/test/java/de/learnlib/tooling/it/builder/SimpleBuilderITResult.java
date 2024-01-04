@@ -131,7 +131,7 @@ public final class SimpleBuilderITResult {
     }
 
     /**
-     * Creates the {@link SimpleBuilderIT} instance with the configured parameters.
+     * Creates a new {@link SimpleBuilderIT} instance with the configured parameters.
      * @return the created instance
      */
     public SimpleBuilderIT create() {

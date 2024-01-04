@@ -103,7 +103,7 @@ public class ExtendingEDSLITResult<I, A extends SuperInterface<?>> {
     }
 
     /**
-     * Delegates to {@link ExtendingEDSLIT#withInitial(Object)}.
+     * Delegates to {@link DefaultEDSLIT#withInitial(Object)}.
      * @param stateId maps to the {@code stateId} parameter of the delegate
      * @return the next fluent state
      */
@@ -338,7 +338,7 @@ public class ExtendingEDSLITResult<I, A extends SuperInterface<?>> {
         }
 
         /**
-         * Delegates to {@link ExtendingEDSLIT#withInitial(Object)}.
+         * Delegates to {@link DefaultEDSLIT#withInitial(Object)}.
          * @param stateId maps to the {@code stateId} parameter of the delegate
          * @return the next fluent state
          */

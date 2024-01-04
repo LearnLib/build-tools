@@ -22,7 +22,7 @@ import de.learnlib.tooling.annotation.refinement.Generic;
                                       @Generic(clazz = SubInterface.class, generics = "Boolean")})
 public class ErrorRefinementIT<O, T1 extends SuperInterface<O>> {
     /*
-     * Private constructors should not be copied because they cannot be called in the refinments.
+     * Private constructors should not be copied because they cannot be called in the refinements.
      */
     private ErrorRefinementIT() {}
     /*

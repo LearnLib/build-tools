@@ -93,7 +93,9 @@ public @interface GenerateRefinement {
     boolean constructorPublic() default true;
 
     /**
-     * Specifies how the documentation of the generated class should be constructed.
+     * Specifies how the documentation of the generated class should be constructed. Only concerns the documentation of
+     * constructors. For the class doc (especially the documentation of type variables) also see
+     * {@link Generic#desc()}.
      *
      * @return the generation type for the documentation
      */

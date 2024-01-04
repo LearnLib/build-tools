@@ -57,7 +57,7 @@ public final class DisablingBuilderITResult {
     }
 
     /**
-     * Creates the {@link DisablingBuilderIT} instance with the configured parameters.
+     * Creates a new {@link DisablingBuilderIT} instance with the configured parameters.
      * @param d the value used for the parameter {@code d}
      * @return the created instance
      */

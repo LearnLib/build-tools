@@ -32,9 +32,6 @@ public class ExtendingEDSLIT<I, A extends SuperInterface<?>> extends DefaultEDSL
     @Action
     public void withAccepting(Object stateId) {}
 
-    @Action
-    public void withInitial(Object stateId) {}
-
     @Override
     @Action
     public void from(Object firstStateId, Object... otherStateIds) {

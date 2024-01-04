@@ -20,8 +20,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Markup annotation that denotes generated files. This annotation has the retention level {@link RetentionPolicy#CLASS}
- * so that code-analysis tools may ignore the generated classes without any additional configuration necessary.
+ * A markup annotation that denotes generated files. This annotation has the retention level
+ * {@link RetentionPolicy#CLASS} so that code-analysis tools may ignore the generated classes without any additional
+ * configuration necessary.
  */
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.TYPE)

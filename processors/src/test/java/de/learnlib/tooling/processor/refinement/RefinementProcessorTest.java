@@ -150,7 +150,7 @@ public class RefinementProcessorTest {
 
         final CompilationSubject subject = CompilationSubject.assertThat(compilation);
         subject.failed();
-        // the non erroneous class should procduce no errors
+        // the non erroneous class should produce no errors
         subject.hadErrorCount(1);
         subject.hadErrorContaining("number of");
     }

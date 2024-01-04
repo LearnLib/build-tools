@@ -132,7 +132,7 @@ public final class RenamedBuilderITResult {
     }
 
     /**
-     * Creates the {@link RenamingBuilderIT} instance with the configured parameters.
+     * Creates a new {@link RenamingBuilderIT} instance with the configured parameters.
      * @return the created instance
      */
     public RenamingBuilderIT create() {
