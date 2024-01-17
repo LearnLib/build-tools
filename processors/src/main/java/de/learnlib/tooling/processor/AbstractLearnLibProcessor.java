@@ -15,6 +15,10 @@
 package de.learnlib.tooling.processor;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -65,7 +69,10 @@ public abstract class AbstractLearnLibProcessor extends AbstractProcessor {
         this.messager = super.processingEnv.getMessager();
         this.typeUtils = super.processingEnv.getTypeUtils();
         this.elementUtils = super.processingEnv.getElementUtils();
-        this.docUtils = DocTrees.instance(processingEnv);
+
+        // DocTrees expects a com.sun.tools.javac.processing.JavacProcessingEnvironment
+        final ProcessingEnvironment unwrappedEnv = unwrapProcessingEnvironment(processingEnv);
+        this.docUtils = DocTrees.instance(unwrappedEnv);
     }
 
     protected void printError(String msg, Element element) {
@@ -137,7 +144,8 @@ public abstract class AbstractLearnLibProcessor extends AbstractProcessor {
                 docBuilder.add(paramBuilder.build());
 
                 for (TypeMirror thrownType : e.getThrownTypes()) {
-                    docBuilder.add("@throws $T if the call to the delegate throws this exception\n", TypeName.get(thrownType));
+                    docBuilder.add("@throws $T if the call to the delegate throws this exception\n",
+                                   TypeName.get(thrownType));
                 }
 
                 consumer.accept(docBuilder.build());
@@ -194,5 +202,64 @@ public abstract class AbstractLearnLibProcessor extends AbstractProcessor {
         } else {
             return false;
         }
+    }
+
+    /*
+     * Work around non-javac-native ProcessingEnvironments that are provided by some build environments but incompatible
+     * with (supposedly non-) internal Java APIs.
+     *
+     * Based on https://youtrack.jetbrains.com/issue/IDEA-274697/java-java.lang.IllegalArgumentException and
+     * https://github.com/typetools/checker-framework/pull/4082
+     */
+    private ProcessingEnvironment unwrapProcessingEnvironment(ProcessingEnvironment env) {
+        if ("com.sun.tools.javac.processing.JavacProcessingEnvironment".equals(env.getClass().getName())) {
+            return env;
+        }
+        // IntelliJ >2020.3 wraps the processing environment in a dynamic proxy.
+        final ProcessingEnvironment unwrappedIntelliJ = unwrapIntelliJ(env);
+        if (unwrappedIntelliJ != null) {
+            return unwrapProcessingEnvironment(unwrappedIntelliJ);
+        }
+        // Gradle incremental build also wraps the processing environment.
+        for (Class<?> envClass = env.getClass(); envClass != null; envClass = envClass.getSuperclass()) {
+            final ProcessingEnvironment unwrappedGradle = unwrapGradle(envClass, env);
+            if (unwrappedGradle != null) {
+                return unwrapProcessingEnvironment(unwrappedGradle);
+            }
+        }
+        messager.printMessage(Kind.ERROR, "Cannot handle processing environment: " + env);
+        return env;
+    }
+
+    private ProcessingEnvironment unwrapIntelliJ(ProcessingEnvironment env) {
+        if (Proxy.isProxyClass(env.getClass())) {
+            try {
+                @SuppressWarnings("PMD.UseProperClassLoader") // we're not in an J2EE context and need the CL of env
+                final Class<?> wrappers =
+                        env.getClass().getClassLoader().loadClass("org.jetbrains.jps.javac.APIWrappers");
+                final Method unwrapMethod = wrappers.getDeclaredMethod("unwrap", Class.class, Object.class);
+                return (ProcessingEnvironment) unwrapMethod.invoke(null, ProcessingEnvironment.class, env);
+            } catch (IllegalAccessException | ClassNotFoundException | InvocationTargetException |
+                     NoSuchMethodException ignored) {
+                // do nothing
+            }
+        }
+
+        return null;
+    }
+
+    private static ProcessingEnvironment unwrapGradle(Class<?> delegateClass, ProcessingEnvironment env) {
+        try {
+            final Field field = delegateClass.getDeclaredField("delegate");
+            field.setAccessible(true);
+            final Object o = field.get(env);
+            if (o instanceof ProcessingEnvironment) {
+                return (ProcessingEnvironment) o;
+            }
+        } catch (NoSuchFieldException | IllegalAccessException ignored) {
+            // do nothing
+        }
+
+        return null;
     }
 }
