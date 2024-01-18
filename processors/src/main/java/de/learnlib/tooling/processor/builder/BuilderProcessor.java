@@ -41,11 +41,9 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
-import com.sun.source.doctree.DocCommentTree;
 import de.learnlib.tooling.annotation.builder.GenerateBuilder;
 import de.learnlib.tooling.annotation.builder.Param;
 import de.learnlib.tooling.processor.AbstractLearnLibProcessor;
-import de.learnlib.tooling.processor.ParamVisitor;
 
 public class BuilderProcessor extends AbstractLearnLibProcessor {
 
@@ -298,10 +296,7 @@ public class BuilderProcessor extends AbstractLearnLibProcessor {
 
         builder.addJavadoc("A builder for constructing {@link $T} instances.\n",
                            super.typeUtils.erasure(element.asType()));
-
-        final DocCommentTree docCommentTree = super.docUtils.getDocCommentTree(element);
-        final ParamVisitor paramVisitor = new ParamVisitor(builder::addJavadoc);
-        paramVisitor.scan(docCommentTree, null);
+        super.extractParamDoc(super.elementUtils.getDocComment(element), builder::addJavadoc);
 
         return builder;
     }

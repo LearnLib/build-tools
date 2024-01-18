@@ -110,6 +110,7 @@ limitations under the License.
         <checkstyle.version>9.3</checkstyle.version>
         <compile-testing.version>0.21.0</compile-testing.version>
         <extra-enforcer-rules.version>1.7.0</extra-enforcer-rules.version>
+        <javadoc-parser.version>0.3.1</javadoc-parser.version>
         <javapoet.version>1.13.0</javapoet.version>
         <mockito.version>5.6.0</mockito.version>
         <testng.version>7.5.1</testng.version>
@@ -140,6 +141,12 @@ limitations under the License.
                 <groupId>de.learnlib.tooling</groupId>
                 <artifactId>processors</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.chhorz</groupId>
+                <artifactId>javadoc-parser</artifactId>
+                <version>${javadoc-parser.version}</version>
             </dependency>
 
             <dependency>

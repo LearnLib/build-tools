@@ -15,10 +15,6 @@
 package de.learnlib.tooling.processor;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -39,6 +35,11 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic.Kind;
 
+import com.github.chhorz.javadoc.JavaDoc;
+import com.github.chhorz.javadoc.JavaDocParser;
+import com.github.chhorz.javadoc.JavaDocParserBuilder;
+import com.github.chhorz.javadoc.OutputType;
+import com.github.chhorz.javadoc.tags.ParamTag;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.CodeBlock;
@@ -53,10 +54,12 @@ import de.learnlib.tooling.annotation.Generated;
 
 public abstract class AbstractLearnLibProcessor extends AbstractProcessor {
 
+    private static final JavaDocParser DOC_PARSER =
+            JavaDocParserBuilder.withStandardJavadocTags().withOutputType(OutputType.PLAIN).build();
+
     private Messager messager;
     protected Types typeUtils;
     protected Elements elementUtils;
-    protected DocTrees docUtils;
 
     @Override
     public SourceVersion getSupportedSourceVersion() {
@@ -69,10 +72,6 @@ public abstract class AbstractLearnLibProcessor extends AbstractProcessor {
         this.messager = super.processingEnv.getMessager();
         this.typeUtils = super.processingEnv.getTypeUtils();
         this.elementUtils = super.processingEnv.getElementUtils();
-
-        // DocTrees expects a com.sun.tools.javac.processing.JavacProcessingEnvironment
-        final ProcessingEnvironment unwrappedEnv = unwrapProcessingEnvironment(processingEnv);
-        this.docUtils = DocTrees.instance(unwrappedEnv);
     }
 
     protected void printError(String msg, Element element) {
@@ -162,6 +161,40 @@ public abstract class AbstractLearnLibProcessor extends AbstractProcessor {
         }
     }
 
+    /**
+     * Extracts from a given javadoc String its {@code @param} definitions and writes them to the given consumer. Note
+     * that {@link DocTrees} exist, but since {@link DocTrees#instance(ProcessingEnvironment)} is only semi-official,
+     * many compilation environments (IntelliJ, Eclipse) do not provide the expected
+     * "com.sun.tools.javac.processing.JavacProcessingEnvironment".
+     *
+     * @param javaDoc
+     *         the (full) javadoc string
+     * @param consumer
+     *         the consumer to write the {@code @param} tags to
+     */
+    protected void extractParamDoc(String javaDoc, Consumer<CodeBlock> consumer) {
+        final JavaDoc parse = DOC_PARSER.parse(javaDoc);
+        for (ParamTag param : parse.getTags(ParamTag.class)) {
+            consumer.accept(CodeBlock.of("@param $L $L\n", param.getParamName(), param.getParamDescription()));
+        }
+    }
+
+    /**
+     * Extracts from a given javadoc String its full description and writes them to the given consumer. Note that
+     * {@link DocTrees} exist, but since {@link DocTrees#instance(ProcessingEnvironment)} is only semi-official, many
+     * compilation environments (IntelliJ, Eclipse) do not provide the expected
+     * "com.sun.tools.javac.processing.JavacProcessingEnvironment".
+     *
+     * @param javaDoc
+     *         the (full) javadoc string
+     * @param consumer
+     *         the consumer to write the {@code @param} tags to
+     */
+    protected void extractDescriptionDoc(String javaDoc, Consumer<CodeBlock> consumer) {
+        final JavaDoc parse = DOC_PARSER.parse(javaDoc);
+        consumer.accept(CodeBlock.of(parse.getDescription() + '\n'));
+    }
+
     protected <T> TypeMirror getClassValue(T obj, Function<T, Class<?>> extractor) {
         try {
             extractor.apply(obj);
@@ -202,64 +235,5 @@ public abstract class AbstractLearnLibProcessor extends AbstractProcessor {
         } else {
             return false;
         }
-    }
-
-    /*
-     * Work around non-javac-native ProcessingEnvironments that are provided by some build environments but incompatible
-     * with (supposedly non-) internal Java APIs.
-     *
-     * Based on https://youtrack.jetbrains.com/issue/IDEA-274697/java-java.lang.IllegalArgumentException and
-     * https://github.com/typetools/checker-framework/pull/4082
-     */
-    private ProcessingEnvironment unwrapProcessingEnvironment(ProcessingEnvironment env) {
-        if ("com.sun.tools.javac.processing.JavacProcessingEnvironment".equals(env.getClass().getName())) {
-            return env;
-        }
-        // IntelliJ >2020.3 wraps the processing environment in a dynamic proxy.
-        final ProcessingEnvironment unwrappedIntelliJ = unwrapIntelliJ(env);
-        if (unwrappedIntelliJ != null) {
-            return unwrapProcessingEnvironment(unwrappedIntelliJ);
-        }
-        // Gradle incremental build also wraps the processing environment.
-        for (Class<?> envClass = env.getClass(); envClass != null; envClass = envClass.getSuperclass()) {
-            final ProcessingEnvironment unwrappedGradle = unwrapGradle(envClass, env);
-            if (unwrappedGradle != null) {
-                return unwrapProcessingEnvironment(unwrappedGradle);
-            }
-        }
-        messager.printMessage(Kind.ERROR, "Cannot handle processing environment: " + env);
-        return env;
-    }
-
-    private ProcessingEnvironment unwrapIntelliJ(ProcessingEnvironment env) {
-        if (Proxy.isProxyClass(env.getClass())) {
-            try {
-                @SuppressWarnings("PMD.UseProperClassLoader") // we're not in an J2EE context and need the CL of env
-                final Class<?> wrappers =
-                        env.getClass().getClassLoader().loadClass("org.jetbrains.jps.javac.APIWrappers");
-                final Method unwrapMethod = wrappers.getDeclaredMethod("unwrap", Class.class, Object.class);
-                return (ProcessingEnvironment) unwrapMethod.invoke(null, ProcessingEnvironment.class, env);
-            } catch (IllegalAccessException | ClassNotFoundException | InvocationTargetException |
-                     NoSuchMethodException ignored) {
-                // do nothing
-            }
-        }
-
-        return null;
-    }
-
-    private static ProcessingEnvironment unwrapGradle(Class<?> delegateClass, ProcessingEnvironment env) {
-        try {
-            final Field field = delegateClass.getDeclaredField("delegate");
-            field.setAccessible(true);
-            final Object o = field.get(env);
-            if (o instanceof ProcessingEnvironment) {
-                return (ProcessingEnvironment) o;
-            }
-        } catch (NoSuchFieldException | IllegalAccessException ignored) {
-            // do nothing
-        }
-
-        return null;
     }
 }

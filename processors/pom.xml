@@ -46,6 +46,11 @@ limitations under the License.
         </dependency>
 
         <dependency>
+            <groupId>com.github.chhorz</groupId>
+            <artifactId>javadoc-parser</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>dk.brics</groupId>
             <artifactId>automaton</artifactId>
         </dependency>

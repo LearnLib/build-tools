@@ -56,13 +56,11 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeSpec.Builder;
 import com.squareup.javapoet.TypeVariableName;
-import com.sun.source.doctree.DocCommentTree;
 import de.learnlib.tooling.annotation.DocGenType;
 import de.learnlib.tooling.annotation.edsl.Action;
 import de.learnlib.tooling.annotation.edsl.Expr;
 import de.learnlib.tooling.annotation.edsl.GenerateEDSL;
 import de.learnlib.tooling.processor.AbstractLearnLibProcessor;
-import de.learnlib.tooling.processor.ParamVisitor;
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.RegExp;
 import dk.brics.automaton.State;
@@ -427,9 +425,7 @@ public class EDSLProcessor extends AbstractLearnLibProcessor {
         switch (annotation.docGenType()) {
             case REFERENCE:
                 builder.addJavadoc("A fluent interface for {@link $T}.\n", super.typeUtils.erasure(element.asType()));
-                final DocCommentTree docCommentTree = super.docUtils.getDocCommentTree(element);
-                final ParamVisitor paramVisitor = new ParamVisitor(builder::addJavadoc);
-                paramVisitor.scan(docCommentTree, null);
+                super.extractParamDoc(super.elementUtils.getDocComment(element), builder::addJavadoc);
                 break;
             case COPY:
                 final String classDoc = super.elementUtils.getDocComment(element);

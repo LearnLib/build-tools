@@ -51,7 +51,6 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 import com.squareup.javapoet.WildcardTypeName;
-import com.sun.source.doctree.DocCommentTree;
 import de.learnlib.tooling.annotation.DocGenType;
 import de.learnlib.tooling.annotation.refinement.GenerateRefinement;
 import de.learnlib.tooling.annotation.refinement.GenerateRefinements;
@@ -59,7 +58,6 @@ import de.learnlib.tooling.annotation.refinement.Generic;
 import de.learnlib.tooling.annotation.refinement.Interface;
 import de.learnlib.tooling.annotation.refinement.Mapping;
 import de.learnlib.tooling.processor.AbstractLearnLibProcessor;
-import de.learnlib.tooling.processor.CommentVisitor;
 
 public class RefinementProcessor extends AbstractLearnLibProcessor {
 
@@ -121,9 +119,7 @@ public class RefinementProcessor extends AbstractLearnLibProcessor {
                 builder.addJavadoc("A type-specific refinement of {@link $T}.\n", ClassName.get(annotatedClass));
                 break;
             case COPY:
-                final DocCommentTree docCommentTree = super.docUtils.getDocCommentTree(annotatedClass);
-                final CommentVisitor commentVisitor = new CommentVisitor(builder::addJavadoc);
-                commentVisitor.scan(docCommentTree, null);
+                super.extractDescriptionDoc(super.elementUtils.getDocComment(annotatedClass), builder::addJavadoc);
                 break;
             case NONE:
             default:
